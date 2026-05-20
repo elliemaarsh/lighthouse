@@ -1,3 +1,12 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Remove default web focus rings (blue outline) on interactive elements */
+button:focus,
+button:focus-visible,
+[role='button']:focus,
+[role='button']:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}

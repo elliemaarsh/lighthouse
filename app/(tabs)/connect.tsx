@@ -1,5 +1,5 @@
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { TabComingSoon } from '@/components/TabComingSoon';
 
 export default function ConnectScreen() {
-  return <PlaceholderScreen title="Connect" />;
+  return <TabComingSoon title="Connect" />;
 }

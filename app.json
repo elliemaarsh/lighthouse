@@ -11,17 +11,19 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#EEF2F0"
+      "backgroundColor": "#305282"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.lighthouse"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#EEF2F0"
+        "backgroundColor": "#305282"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.anonymous.lighthouse"
     },
     "web": {
       "bundler": "metro",
@@ -34,9 +36,10 @@
         "expo-notifications",
         {
           "icon": "./assets/images/icon.png",
-          "color": "#EEF2F0"
+          "color": "#12181C"
         }
-      ]
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

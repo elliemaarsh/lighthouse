@@ -1,5 +1,5 @@
-import { PlaceholderScreen } from '@/components/PlaceholderScreen';
+import { TabComingSoon } from '@/components/TabComingSoon';
 
 export default function CommunityScreen() {
-  return <PlaceholderScreen title="Community" />;
+  return <TabComingSoon title="Community" />;
 }
