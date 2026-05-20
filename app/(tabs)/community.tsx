@@ -1,5 +1,5 @@
 import { TabComingSoon } from '@/components/TabComingSoon';
 
 export default function CommunityScreen() {
-  return <TabComingSoon title="Community" />;
+  return <TabComingSoon title="Forum" />;
 }

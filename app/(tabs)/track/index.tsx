@@ -4,19 +4,24 @@ import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
+
 import { CheckInSummaryGrid } from '@/components/CheckInSummaryGrid';
 import { DataMetricCard } from '@/components/DataMetricCard';
 import { GlassCard } from '@/components/GlassCard';
 import { PillButton } from '@/components/onboarding/PillButton';
 import { routes } from '@/constants/routes';
+import PartnerTrackScreen from './partner';
 import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
 import { todayCheckInSession } from '@/lib/todayCheckIn';
 import type { TodayLogSummary } from '@/types/checkIn';
+import { useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function TrackScreen() {
   const role = useUserStore((s) => s.role);
-  const setRole = useUserStore((s) => s.setRole);
+  const setTabBarHidden = useTabBarStore((s) => s.setHidden);
+  const scrollBottomPad = useTabBarScrollPadding();
   const [hasLoggedToday, setHasLoggedToday] = useState(
     todayCheckInSession.getHasLoggedToday(),
   );
@@ -28,32 +33,18 @@ export default function TrackScreen() {
     useCallback(() => {
       setHasLoggedToday(todayCheckInSession.getHasLoggedToday());
       setTodayLog(todayCheckInSession.getTodayLog());
-    }, []),
+      if (role !== 'non-carrying') {
+        setTabBarHidden(false);
+      }
+    }, [role, setTabBarHidden]),
   );
 
   if (role === 'non-carrying') {
-    return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
-        <View style={styles.placeholder}>
-          <Text style={styles.placeholderTitle}>Track</Text>
-          <Text style={styles.placeholderSub}>
-            You set up as a supporting partner. Partner insights are coming soon.
-          </Text>
-          <Text style={styles.placeholderHint}>
-            Daily check-ins are for the carrying partner — the person tracking their
-            cycle, symptoms, and mood.
-          </Text>
-          <PillButton
-            label="I track my cycle →"
-            onPress={() => setRole('carrying')}
-            style={styles.switchRoleBtn}
-          />
-        </View>
-      </SafeAreaView>
-    );
+    return <PartnerTrackScreen />;
   }
 
   const beginCheckIn = () => {
+    setTabBarHidden(true);
     router.push(routes.checkinStep1);
   };
 
@@ -61,8 +52,10 @@ export default function TrackScreen() {
     <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         style={styles.scrollView}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingBottom: scrollBottomPad }]}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bounces
       >
         {!hasLoggedToday ? (
           <>
@@ -126,7 +119,6 @@ const styles = StyleSheet.create({
   scroll: {
     paddingTop: 60,
     paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.tabBarInset,
   },
   greeting: {
     fontSize: fontSizes.label,
@@ -181,36 +173,5 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlign: 'center',
     ...textContrast,
-  },
-  placeholder: {
-    flex: 1,
-    paddingTop: 60,
-    paddingHorizontal: spacing.lg,
-  },
-  placeholderTitle: {
-    fontSize: 28,
-    fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
-    ...textContrast,
-  },
-  placeholderSub: {
-    fontSize: fontSizes.body,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginTop: 8,
-    lineHeight: 22,
-    ...textContrast,
-  },
-  placeholderHint: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginTop: 16,
-    lineHeight: 20,
-    ...textContrast,
-  },
-  switchRoleBtn: {
-    marginTop: 28,
-    alignSelf: 'flex-start',
   },
 });

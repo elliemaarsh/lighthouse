@@ -1,8 +1,17 @@
+import { Feather } from '@expo/vector-icons';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { noFocusRing } from '@/lib/focusRing';
-import { colors, fontSizes, fonts, radius, spacing, typography } from '@/constants/theme';
+import {
+  colors,
+  fontSizes,
+  fonts,
+  radius,
+  spacing,
+  textContrast,
+  typography,
+} from '@/constants/theme';
 
 type RoleCardProps = {
   title: string;
@@ -20,14 +29,21 @@ export function RoleCard({ title, description, selected, onPress }: RoleCardProp
       accessibilityState={{ selected }}
     >
       <GlassSurface
-        variant={selected ? 'selected' : 'pill'}
-        borderRadius={radius.pill}
+        variant={selected ? 'selected' : 'card'}
+        borderRadius={radius.card}
         shadow={selected ? 'card' : 'soft'}
         style={styles.card}
       >
         <View style={styles.inner}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.description}>{description}</Text>
+          <View style={styles.copy}>
+            <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
+            <Text style={styles.description}>{description}</Text>
+          </View>
+          <View style={[styles.ring, selected && styles.ringSelected]}>
+            {selected ? (
+              <Feather name="check" size={16} color={colors.textPrimary} />
+            ) : null}
+          </View>
         </View>
       </GlassSurface>
     </Pressable>
@@ -36,31 +52,57 @@ export function RoleCard({ title, description, selected, onPress }: RoleCardProp
 
 const styles = StyleSheet.create({
   pressable: {
-    marginBottom: spacing.md,
-    borderRadius: radius.pill,
+    borderRadius: radius.card,
     overflow: 'hidden',
   },
   pressed: {
-    opacity: 0.92,
+    opacity: 0.94,
+    transform: [{ scale: 0.995 }],
   },
   card: {
     width: '100%',
   },
   inner: {
-    padding: spacing.lg,
-    paddingVertical: 22,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 20,
+    minHeight: 108,
+  },
+  copy: {
+    flex: 1,
+    gap: 6,
   },
   title: {
-    fontSize: fontSizes.body,
-    fontFamily: fonts.semiBold,
+    fontSize: fontSizes.h3,
+    fontFamily: fonts.medium,
     color: colors.textPrimary,
-    marginBottom: spacing.sm,
-    letterSpacing: 0.15,
+    letterSpacing: 0.1,
+    ...textContrast,
+  },
+  titleSelected: {
+    fontFamily: fonts.semiBold,
   },
   description: {
     fontSize: 14,
     fontFamily: typography.subtext.fontFamily,
     color: colors.textSecondary,
-    lineHeight: 20,
+    lineHeight: 21,
+    ...textContrast,
+  },
+  ring: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(255, 255, 255, 0.35)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+  },
+  ringSelected: {
+    borderColor: colors.cardSelectedBorder,
+    backgroundColor: 'rgba(255, 255, 255, 0.18)',
   },
 });

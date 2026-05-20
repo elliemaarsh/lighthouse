@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     letterSpacing: typography.headline.letterSpacing,
     color: typography.headline.color,
     lineHeight: fontSizes.h1 * 1.2,
-    marginBottom: spacing.md,
+    marginBottom: spacing.lg,
   },
   subtext: {
     fontSize: fontSizes.body,

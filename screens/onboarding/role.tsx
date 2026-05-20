@@ -38,18 +38,20 @@ export default function RoleScreen() {
         <OnboardingTypography variant="headlineRole">
           Which best describes you?
         </OnboardingTypography>
-        <RoleCard
-          title="I track my cycle"
-          description="I log my period, symptoms, mood, and daily check-ins"
-          selected={role === 'carrying'}
-          onPress={() => handleSelect('carrying')}
-        />
-        <RoleCard
-          title="I support my partner"
-          description="My partner tracks their cycle — I follow along and stay informed"
-          selected={role === 'non-carrying'}
-          onPress={() => handleSelect('non-carrying')}
-        />
+        <View style={styles.cards}>
+          <RoleCard
+            title="I track my cycle"
+            description="I log my period, symptoms, mood, and daily check-ins"
+            selected={role === 'carrying'}
+            onPress={() => handleSelect('carrying')}
+          />
+          <RoleCard
+            title="I support my partner"
+            description="My partner tracks their cycle — I follow along and stay informed"
+            selected={role === 'non-carrying'}
+            onPress={() => handleSelect('non-carrying')}
+          />
+        </View>
       </View>
     </OnboardingScreen>
   );
@@ -58,5 +60,9 @@ export default function RoleScreen() {
 const styles = StyleSheet.create({
   body: {
     flex: 1,
+  },
+  cards: {
+    gap: 14,
+    marginTop: spacing.sm,
   },
 });

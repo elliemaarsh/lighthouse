@@ -13,6 +13,13 @@ export const colors = {
   /** Ruler picker center tick */
   accentLime: '#C8E86A',
 
+  /** Partner / health metric accents on gradient */
+  heatLow: '#A8D4B0',
+  heatMedium: '#E0B89A',
+  heatHigh: '#D99A9A',
+  substancesNone: '#C8E86A',
+  loggedDot: '#C8E86A',
+
   surface: 'rgba(255, 255, 255, 0.06)',
 
   cardUnselectedBg: 'rgba(255, 255, 255, 0.05)',
@@ -32,6 +39,31 @@ export const colors = {
 
   avatarBg: 'rgba(255, 255, 255, 0.1)',
   white: '#FFFFFF',
+};
+
+/** Non-carrying partner Track dashboard (light mist surface) */
+export const partnerDashboard = {
+  background: '#E8ECEE',
+  textPrimary: '#1A2422',
+  textSecondary: 'rgba(26, 36, 34, 0.65)',
+  textMuted: 'rgba(26, 36, 34, 0.45)',
+  progressTrack: 'rgba(26, 36, 34, 0.08)',
+  progressFill: '#1A2422',
+  streakBg: '#1A2422',
+  streakText: '#FFFFFF',
+  cardBorder: 'rgba(255, 255, 255, 0.4)',
+  loggedDot: '#7BAF8A',
+  heatLow: '#7BAF8A',
+  heatMedium: '#C4947A',
+  heatHigh: '#C17B7B',
+  substancesNone: '#7BAF8A',
+  decoration: 'rgba(26, 36, 34, 0.06)',
+  decorationStrong: 'rgba(26, 36, 34, 0.08)',
+  sheetHandle: 'rgba(26, 36, 34, 0.15)',
+  selectedBg: '#1A2422',
+  selectedText: '#FFFFFF',
+  inputBg: '#FFFFFF',
+  quickPillBg: 'rgba(255, 255, 255, 0.55)',
 };
 
 /** Geist family names (loaded in app/_layout.tsx) */
@@ -82,7 +114,8 @@ export const spacing = {
   lg: 24,
   xl: 40,
   footer: 48,
-  tabBarInset: 100,
+  /** Space above floating tab bar (pill + safe area + breathing room) */
+  tabBarInset: 128,
 };
 
 export const typography = {

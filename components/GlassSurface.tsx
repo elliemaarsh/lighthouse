@@ -1,8 +1,19 @@
 import { BlurView } from '@react-native-community/blur';
 import type { ReactNode } from 'react';
+import { useEffect } from 'react';
 import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
-import { glass, glassShadow, glassShadowSoft } from '@/constants/glass';
+import {
+  GLASS_SELECT_DURATION,
+  glass,
+  glassShadow,
+  glassShadowSoft,
+} from '@/constants/glass';
 
 export type GlassVariant = 'card' | 'pill' | 'input' | 'dark' | 'data' | 'selected';
 
@@ -14,28 +25,24 @@ type GlassSurfaceProps = {
   shadow?: 'none' | 'soft' | 'card';
 };
 
+function baseFrostForVariant(variant: GlassVariant): string {
+  if (variant === 'pill' || variant === 'data') {
+    return glass.frostBare;
+  }
+  if (variant === 'input') {
+    return glass.frostInput;
+  }
+  /* card + selected share base; selection fog cross-fades on top */
+  return glass.frostCard;
+}
+
 function blurConfig(variant: GlassVariant) {
-  const frost =
-    variant === 'selected'
-      ? glass.frostSelected
-      : variant === 'pill'
-        ? glass.frostBare
-        : variant === 'data'
-          ? glass.frostBare
-          : variant === 'input'
-            ? glass.frostLight
-            : glass.frostLight;
-
-  const borderColor =
-    variant === 'selected' ? glass.borderLightStrong : glass.borderLight;
-
   return {
     blurType: glass.blurTypeLight,
     blurAmount: glass.blurAmountLight,
-    borderColor,
-    frost,
     reducedTransparencyFallbackColor: glass.fallbackLight,
-    webOpacity: 0.35,
+    baseFrost: baseFrostForVariant(variant),
+    isSelected: variant === 'selected',
   };
 }
 
@@ -46,17 +53,33 @@ export function GlassSurface({
   variant = 'card',
   shadow = 'soft',
 }: GlassSurfaceProps) {
-  const { blurType, blurAmount, borderColor, frost, reducedTransparencyFallbackColor, webOpacity } =
+  const { blurType, blurAmount, reducedTransparencyFallbackColor, baseFrost, isSelected } =
     blurConfig(variant);
   const shadowStyle =
     shadow === 'card' ? glassShadow : shadow === 'soft' ? glassShadowSoft : null;
+
+  const selectionProgress = useSharedValue(isSelected ? 1 : 0);
+
+  useEffect(() => {
+    selectionProgress.value = withTiming(isSelected ? 1 : 0, {
+      duration: GLASS_SELECT_DURATION,
+    });
+  }, [isSelected, selectionProgress]);
+
+  const selectionFrostStyle = useAnimatedStyle(() => ({
+    opacity: selectionProgress.value,
+  }));
+
+  const selectionBorderStyle = useAnimatedStyle(() => ({
+    opacity: selectionProgress.value,
+  }));
 
   return (
     <View
       style={[
         styles.shell,
         shadowStyle,
-        { borderRadius, borderColor, overflow: 'hidden' as const },
+        { borderRadius, borderColor: glass.borderLight, overflow: 'hidden' as const },
         style,
       ]}
     >
@@ -71,14 +94,28 @@ export function GlassSurface({
               },
             ]}
           />
-          {frost ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { borderRadius, backgroundColor: frost, opacity: webOpacity },
-              ]}
-            />
-          ) : null}
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                borderRadius,
+                backgroundColor: baseFrost,
+                opacity: glass.webFrostOpacity,
+              },
+            ]}
+          />
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                borderRadius,
+                backgroundColor: glass.frostSelectionOverlay,
+                opacity: glass.webFrostOpacity,
+              },
+              selectionFrostStyle,
+            ]}
+            pointerEvents="none"
+          />
         </>
       ) : (
         <>
@@ -88,16 +125,37 @@ export function GlassSurface({
             blurAmount={blurAmount}
             reducedTransparencyFallbackColor="transparent"
           />
-          {frost ? (
-            <View
-              style={[
-                StyleSheet.absoluteFill,
-                { borderRadius, backgroundColor: frost },
-              ]}
-            />
-          ) : null}
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              { borderRadius, backgroundColor: baseFrost },
+            ]}
+            pointerEvents="none"
+          />
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              { borderRadius, backgroundColor: glass.frostSelectionOverlay },
+              selectionFrostStyle,
+            ]}
+            pointerEvents="none"
+          />
         </>
       )}
+
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            borderRadius,
+            borderWidth: 1,
+            borderColor: glass.borderLightStrong,
+          },
+          selectionBorderStyle,
+        ]}
+      />
+
       <View
         style={[
           styles.edgeHighlightTop,

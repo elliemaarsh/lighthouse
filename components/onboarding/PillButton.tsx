@@ -37,9 +37,9 @@ export const PillButton = forwardRef<ComponentRef<typeof Pressable>, PillButtonP
         accessibilityState={{ disabled }}
       >
         <GlassSurface
-          variant={isGhost ? 'pill' : 'selected'}
+          variant={isGhost ? 'pill' : disabled ? 'card' : 'selected'}
           borderRadius={radius.pill}
-          shadow="card"
+          shadow={disabled ? 'soft' : 'card'}
           style={styles.glass}
         >
           <View style={styles.inner}>
@@ -47,6 +47,7 @@ export const PillButton = forwardRef<ComponentRef<typeof Pressable>, PillButtonP
               style={[
                 styles.label,
                 isGhost ? styles.labelGhost : styles.labelPrimary,
+                !disabled && !isGhost && styles.labelEmphasis,
               ]}
             >
               {label}
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 28,
   },
   disabled: {
-    opacity: 0.4,
+    opacity: 0.55,
   },
   pressed: {
     opacity: 0.92,
@@ -87,6 +88,9 @@ const styles = StyleSheet.create({
   labelPrimary: {
     color: colors.textPrimary,
     ...textContrast,
+  },
+  labelEmphasis: {
+    fontFamily: fonts.semiBold,
   },
   labelGhost: {
     color: colors.textSecondary,

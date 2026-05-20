@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import '../global.css';
 
 import {
@@ -13,7 +14,7 @@ import { useEffect } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AppGradientBackground } from '@/components/AppGradientBackground';
+import { AppRootBackground } from '@/components/AppRootBackground';
 import { colors } from '@/constants/theme';
 import { useOnboardingNavigation } from '@/hooks/useOnboardingNavigation';
 
@@ -50,7 +51,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <View style={styles.root}>
-        <AppGradientBackground style={StyleSheet.absoluteFillObject} />
+        <AppRootBackground style={StyleSheet.absoluteFillObject} />
         <Stack
           screenOptions={{
             headerShown: false,

@@ -1,9 +1,21 @@
+import { useFocusEffect } from '@react-navigation/native';
 import { Stack } from 'expo-router';
+import { useCallback } from 'react';
 
 import { CheckInProvider } from '@/contexts/CheckInContext';
 import { colors } from '@/constants/theme';
+import { useTabBarStore } from '@/store/useTabBarStore';
 
 export default function CheckInLayout() {
+  const setTabBarHidden = useTabBarStore((s) => s.setHidden);
+
+  useFocusEffect(
+    useCallback(() => {
+      setTabBarHidden(true);
+      return () => setTabBarHidden(false);
+    }, [setTabBarHidden]),
+  );
+
   return (
     <CheckInProvider>
       <Stack

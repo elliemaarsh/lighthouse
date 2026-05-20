@@ -1,13 +1,11 @@
 import { Stack } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 
-import { AppGradientBackground } from '@/components/AppGradientBackground';
 import { colors } from '@/constants/theme';
 
 export default function TrackLayout() {
   return (
     <View style={styles.root}>
-      <AppGradientBackground style={StyleSheet.absoluteFillObject} />
       <Stack
         screenOptions={{
           headerShown: false,
@@ -16,6 +14,7 @@ export default function TrackLayout() {
         }}
       >
         <Stack.Screen name="index" />
+        <Stack.Screen name="partner" />
         <Stack.Screen name="checkin" />
       </Stack>
     </View>
