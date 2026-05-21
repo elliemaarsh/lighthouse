@@ -19,5 +19,8 @@ export const routes = {
   connectPulseCheck: '/(tabs)/connect/pulse-check' as Href,
   connectPulsePreview: '/(tabs)/connect/pulse-preview' as Href,
   connectTreatment: '/(tabs)/connect/treatment' as Href,
+  learn: '/(tabs)/learn' as Href,
+  learnArticle: '/(tabs)/learn/article' as Href,
+  trackExport: '/(tabs)/track/export' as Href,
   settings: '/settings' as Href,
 } as const;

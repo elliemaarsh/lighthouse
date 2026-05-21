@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
 
+import { MedicalExportCard } from '@/components/track/MedicalExportCard';
 import { CheckInSummaryGrid } from '@/components/CheckInSummaryGrid';
 import { DataMetricCard } from '@/components/DataMetricCard';
 import { GlassCard } from '@/components/GlassCard';
@@ -90,6 +91,8 @@ export default function TrackScreen() {
                 style={styles.fullWidth}
               />
             </View>
+
+            <MedicalExportCard />
           </>
         ) : (
           <>
@@ -101,6 +104,8 @@ export default function TrackScreen() {
             <Pressable onPress={beginCheckIn} style={styles.editWrap}>
               <Text style={styles.editLink}>Edit today's log</Text>
             </Pressable>
+
+            <MedicalExportCard />
           </>
         )}
       </ScrollView>

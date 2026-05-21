@@ -26,6 +26,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { MedicalExportCard } from '@/components/track/MedicalExportCard';
 import { PartnerCategoryCard } from '@/components/partner/PartnerCategoryCard';
 import { PartnerDailyStreakCard } from '@/components/partner/PartnerDailyStreakCard';
 import { PartnerTipCard } from '@/components/partner/PartnerTipCard';
@@ -200,6 +201,10 @@ export default function PartnerTrackScreen() {
                 onPress={() => openCategory('notes')}
               />
             </View>
+
+            <View style={styles.exportWrap}>
+              <MedicalExportCard />
+            </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -285,6 +290,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+  },
+  exportWrap: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
   },

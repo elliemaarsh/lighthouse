@@ -15,6 +15,7 @@ export default function TrackLayout() {
       >
         <Stack.Screen name="index" />
         <Stack.Screen name="partner" />
+        <Stack.Screen name="export" />
         <Stack.Screen name="checkin" />
       </Stack>
     </View>
