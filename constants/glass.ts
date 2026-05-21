@@ -2,9 +2,9 @@ import type { ViewStyle } from 'react-native';
 
 import { colors } from '@/constants/theme';
 
-/** White tint on top of blur — keep very low for true glass, not milky fog */
-export const FROST_PILL_BASE = 0.01;
-export const FROST_PILL_SELECTED_DELTA = 0.06;
+/** White tint on top of blur — visible on flat light blue */
+export const FROST_PILL_BASE = 0.42;
+export const FROST_PILL_SELECTED_DELTA = 0.18;
 
 /** Selection frost fade duration (ms) */
 export const GLASS_SELECT_DURATION = 220;
@@ -12,29 +12,27 @@ export const GLASS_SELECT_DURATION = 220;
 export const glass = {
   blurTypeLight: 'light' as const,
   blurTypeDark: 'dark' as const,
-  /** Stronger blur, minimal white wash — gradient shows through */
   blurAmountLight: 24,
   blurAmountDark: 20,
-  borderLight: 'rgba(255, 255, 255, 0.16)',
-  borderLightStrong: 'rgba(255, 255, 255, 0.24)',
-  borderDark: 'rgba(255, 255, 255, 0.14)',
+  borderLight: colors.cardUnselectedBorder,
+  borderLightStrong: colors.cardSelectedBorder,
+  borderDark: 'rgba(26, 36, 34, 0.12)',
   frostBare: `rgba(255, 255, 255, ${FROST_PILL_BASE})`,
-  frostCard: 'rgba(255, 255, 255, 0.02)',
-  frostLight: 'rgba(255, 255, 255, 0.02)',
-  frostInput: 'rgba(255, 255, 255, 0.035)',
-  frostStrong: 'rgba(255, 255, 255, 0.04)',
-  /** Extra layer cross-faded in when variant is `selected` */
+  frostCard: 'rgba(255, 255, 255, 0.42)',
+  frostLight: 'rgba(255, 255, 255, 0.42)',
+  frostInput: 'rgba(255, 255, 255, 0.65)',
+  frostStrong: 'rgba(255, 255, 255, 0.55)',
   frostSelectionOverlay: `rgba(255, 255, 255, ${FROST_PILL_SELECTED_DELTA})`,
   frostSelected: `rgba(255, 255, 255, ${FROST_PILL_BASE + FROST_PILL_SELECTED_DELTA})`,
-  highlight: 'rgba(255, 255, 255, 0.22)',
-  fallbackLight: 'rgba(255, 255, 255, 0.02)',
-  fallbackDark: 'rgba(255, 255, 255, 0.02)',
-  webFrostOpacity: 0.12,
+  highlight: 'rgba(255, 255, 255, 0.75)',
+  fallbackLight: 'rgba(255, 255, 255, 0.42)',
+  fallbackDark: 'rgba(255, 255, 255, 0.42)',
+  webFrostOpacity: 0.55,
   dataRadius: 28,
-  line: 'rgba(255, 255, 255, 0.1)',
-  lineStrong: 'rgba(255, 255, 255, 0.28)',
-  lineLight: 'rgba(255, 255, 255, 0.1)',
-  lineLightStrong: 'rgba(255, 255, 255, 0.28)',
+  line: 'rgba(26, 36, 34, 0.1)',
+  lineStrong: 'rgba(26, 36, 34, 0.22)',
+  lineLight: 'rgba(26, 36, 34, 0.1)',
+  lineLightStrong: 'rgba(26, 36, 34, 0.22)',
 };
 
 export const metricText = {

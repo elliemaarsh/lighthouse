@@ -61,6 +61,7 @@ export function SleepSheetContent({ log, onSave }: SleepSheetContentProps) {
             label={`${h}h`}
             selected={hours === parseFloat(h)}
             onPress={() => setHours(parseFloat(h))}
+            tone="partner"
           />
         ))}
       </View>

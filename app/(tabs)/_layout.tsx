@@ -24,7 +24,13 @@ export default function TabLayout() {
           sceneStyle: { backgroundColor: colors.backgroundTransparent },
         }}
       />
-      <Tabs.Screen name="connect" options={{ title: 'Connect' }} />
+      <Tabs.Screen
+        name="connect"
+        options={{
+          title: 'Connect',
+          sceneStyle: { backgroundColor: colors.backgroundTransparent },
+        }}
+      />
       <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
       <Tabs.Screen name="community" options={{ title: 'Forum' }} />
     </Tabs>

@@ -51,6 +51,7 @@ export function ExerciseSheetContent({ log, onSave }: ExerciseSheetContentProps)
             label={t}
             selected={types.includes(t)}
             onPress={() => toggleType(t)}
+            tone="partner"
           />
         ))}
       </View>

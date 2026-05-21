@@ -20,6 +20,7 @@ import { useUserStore } from '@/store/useUserStore';
 
 export default function TrackScreen() {
   const role = useUserStore((s) => s.role);
+  const userId = useUserStore((s) => s.userId);
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
   const scrollBottomPad = useTabBarScrollPadding();
   const [hasLoggedToday, setHasLoggedToday] = useState(
@@ -31,12 +32,12 @@ export default function TrackScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      setHasLoggedToday(todayCheckInSession.getHasLoggedToday());
-      setTodayLog(todayCheckInSession.getTodayLog());
-      if (role !== 'non-carrying') {
-        setTabBarHidden(false);
-      }
-    }, [role, setTabBarHidden]),
+      void todayCheckInSession.hydrate(userId).then(() => {
+        setHasLoggedToday(todayCheckInSession.getHasLoggedToday());
+        setTodayLog(todayCheckInSession.getTodayLog());
+      });
+      setTabBarHidden(false);
+    }, [role, setTabBarHidden, userId]),
   );
 
   if (role === 'non-carrying') {

@@ -15,4 +15,9 @@ export const routes = {
   /** Notes step (file: step5.tsx — legacy filename) */
   checkinStep4Notes: '/(tabs)/track/checkin/step5' as Href,
   checkinComplete: '/(tabs)/track/checkin/complete' as Href,
+  connect: '/(tabs)/connect' as Href,
+  connectPulseCheck: '/(tabs)/connect/pulse-check' as Href,
+  connectPulsePreview: '/(tabs)/connect/pulse-preview' as Href,
+  connectTreatment: '/(tabs)/connect/treatment' as Href,
+  settings: '/settings' as Href,
 } as const;

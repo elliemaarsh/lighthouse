@@ -25,6 +25,8 @@ import { GlassSurface } from '@/components/GlassSurface';
 import { PillButton } from '@/components/onboarding/PillButton';
 import { useCheckIn } from '@/contexts/CheckInContext';
 import { saveDailyLog, getTodayDateString } from '@/lib/dailyLogs';
+import { ensureLocalUserId } from '@/lib/localUserId';
+import { publishCarryingPartnerSharedLog } from '@/lib/partnerSharedLog';
 import { todayCheckInSession } from '@/lib/todayCheckIn';
 import { routes } from '@/constants/routes';
 import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
@@ -33,6 +35,7 @@ import { useUserStore } from '@/store/useUserStore';
 export default function CheckInCompleteScreen() {
   const { data, reset } = useCheckIn();
   const userId = useUserStore((s) => s.userId);
+  const role = useUserStore((s) => s.role);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -40,12 +43,17 @@ export default function CheckInCompleteScreen() {
     const snapshot = { ...data };
 
     const persist = async () => {
-      await saveDailyLog(userId, snapshot);
+      const uid = userId ?? ensureLocalUserId();
+      await saveDailyLog(uid, snapshot);
+      const logged = {
+        ...snapshot,
+        date: getTodayDateString(),
+      };
+      if (role === 'carrying' || role === 'both') {
+        await publishCarryingPartnerSharedLog(logged);
+      }
       if (mounted) {
-        todayCheckInSession.setLogged({
-          ...snapshot,
-          date: getTodayDateString(),
-        });
+        todayCheckInSession.setLogged(logged);
         reset();
         setSaved(true);
       }
@@ -56,7 +64,7 @@ export default function CheckInCompleteScreen() {
     return () => {
       mounted = false;
     };
-  }, [data, reset, userId]);
+  }, [data, reset, role, userId]);
 
   const goHome = () => {
     router.replace(routes.track);

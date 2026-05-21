@@ -22,7 +22,9 @@ const TAB_ICONS: Record<string, TabIconName> = {
   community: 'community',
 };
 
-const TAB_ACTIVE_CONTENT = '#9AA8B2';
+const TAB_ACTIVE_CONTENT = colors.textPrimary;
+const TAB_HOVER_CONTENT = colors.textPrimary;
+const TAB_HOVER_INACTIVE = colors.textSecondary;
 
 const PILL_HEIGHT = 56;
 const PILL_PAD_H = 12;
@@ -185,7 +187,6 @@ export function FloatingGlassTabBar({
                   : route.name;
             const focused = activeIndex === index;
             const iconName = TAB_ICONS[route.name] ?? 'home';
-            const contentColor = focused ? TAB_ACTIVE_CONTENT : colors.textMuted;
 
             return (
               <Pressable
@@ -209,21 +210,43 @@ export function FloatingGlassTabBar({
                 accessibilityState={focused ? { selected: true } : {}}
                 accessibilityLabel={label}
               >
-                <View
-                  style={styles.tabContent}
-                  onLayout={(e: LayoutChangeEvent) => {
-                    const { width } = e.nativeEvent.layout;
-                    updateMetrics(index, { contentWidth: width });
-                  }}
-                >
-                  <TabIcon name={iconName} color={contentColor} focused={focused} />
-                  <Text
-                    style={[styles.label, { color: contentColor }, focused && styles.labelActive]}
-                    numberOfLines={1}
-                  >
-                    {label}
-                  </Text>
-                </View>
+                {({ hovered }) => {
+                  const contentColor = hovered
+                    ? focused
+                      ? TAB_HOVER_CONTENT
+                      : TAB_HOVER_INACTIVE
+                    : focused
+                      ? TAB_ACTIVE_CONTENT
+                      : colors.textMuted;
+
+                  return (
+                    <View
+                      style={styles.tabContent}
+                      onLayout={(e: LayoutChangeEvent) => {
+                        const { width } = e.nativeEvent.layout;
+                        updateMetrics(index, { contentWidth: width });
+                      }}
+                    >
+                      <TabIcon
+                        name={iconName}
+                        color={contentColor}
+                        focused={focused}
+                        hovered={hovered}
+                      />
+                      <Text
+                        style={[
+                          styles.label,
+                          { color: contentColor },
+                          focused && styles.labelActive,
+                          hovered && styles.labelHover,
+                        ]}
+                        numberOfLines={1}
+                      >
+                        {label}
+                      </Text>
+                    </View>
+                  );
+                }}
               </Pressable>
             );
           })}
@@ -297,5 +320,8 @@ const styles = StyleSheet.create({
   },
   labelActive: {
     fontFamily: fonts.semiBold,
+  },
+  labelHover: {
+    opacity: 1,
   },
 });

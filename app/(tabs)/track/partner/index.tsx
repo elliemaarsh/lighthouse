@@ -40,6 +40,7 @@ import {
   formatSubstancesValue,
   isCategoryLogged,
 } from '@/lib/partnerDisplay';
+import { ensureLocalUserId } from '@/lib/localUserId';
 import { fetchPartnerLogForToday, savePartnerLog } from '@/lib/partnerLogs';
 import { fetchPartnerStreak } from '@/lib/partnerStreak';
 import {
@@ -70,13 +71,12 @@ export default function PartnerTrackScreen() {
   const sheetRef = useRef<BottomSheetModal>(null);
 
   const loadToday = useCallback(async () => {
+    const uid = userId ?? ensureLocalUserId();
     const [{ data }, streakDays] = await Promise.all([
-      fetchPartnerLogForToday(userId),
-      fetchPartnerStreak(userId),
+      fetchPartnerLogForToday(uid),
+      fetchPartnerStreak(uid),
     ]);
-    if (data) {
-      setLog(data);
-    }
+    setLog(data ?? initialPartnerLog);
     setStreak(streakDays);
   }, [userId]);
 
@@ -106,10 +106,11 @@ export default function PartnerTrackScreen() {
   };
 
   const handleSaveCategory = async (patch: Partial<PartnerLogData>) => {
+    const uid = userId ?? ensureLocalUserId();
     const next = { ...log, ...patch };
     setLog(next);
-    await savePartnerLog(userId, next);
-    const streakDays = await fetchPartnerStreak(userId);
+    await savePartnerLog(uid, next);
+    const streakDays = await fetchPartnerStreak(uid);
     setStreak(streakDays);
   };
 

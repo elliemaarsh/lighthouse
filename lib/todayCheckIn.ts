@@ -1,6 +1,8 @@
+import { fetchDailyLogForToday } from '@/lib/dailyLogs';
+import { ensureLocalUserId } from '@/lib/localUserId';
 import type { TodayLogSummary } from '@/types/checkIn';
 
-/** Ephemeral session state for today's check-in (not persisted in Zustand). */
+/** In-memory cache for today's carrying check-in (hydrated from storage on focus). */
 let hasLoggedToday = false;
 let todayLog: TodayLogSummary | null = null;
 
@@ -14,5 +16,16 @@ export const todayCheckInSession = {
   clear: () => {
     hasLoggedToday = false;
     todayLog = null;
+  },
+  async hydrate(userId: string | null): Promise<void> {
+    const uid = userId ?? ensureLocalUserId();
+    const { data } = await fetchDailyLogForToday(uid);
+    if (data) {
+      hasLoggedToday = true;
+      todayLog = data;
+    } else {
+      hasLoggedToday = false;
+      todayLog = null;
+    }
   },
 };

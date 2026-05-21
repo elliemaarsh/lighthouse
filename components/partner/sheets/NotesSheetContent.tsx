@@ -43,7 +43,13 @@ export function NotesSheetContent({ log, onSave }: NotesSheetContentProps) {
       </GlassSurface>
       <View style={styles.quickRow}>
         {NOTE_QUICK_INSERTS.map((text) => (
-          <GlassChip key={text} label={text} selected={false} onPress={() => insert(text)} />
+          <GlassChip
+            key={text}
+            label={text}
+            selected={false}
+            onPress={() => insert(text)}
+            tone="partner"
+          />
         ))}
       </View>
     </PartnerSheetShell>

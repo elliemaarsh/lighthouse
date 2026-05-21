@@ -20,10 +20,12 @@ type TabIconProps = {
   name: TabIconName;
   color: string;
   focused: boolean;
+  hovered?: boolean;
 };
 
-export function TabIcon({ name, color, focused }: TabIconProps) {
+export function TabIcon({ name, color, focused, hovered = false }: TabIconProps) {
   const glyph = focused ? ICONS[name].filled : ICONS[name].outline;
+  const iconStyle = focused || hovered ? styles.iconFocused : styles.icon;
 
   return (
     <View style={styles.wrap}>
@@ -31,7 +33,7 @@ export function TabIcon({ name, color, focused }: TabIconProps) {
         name={glyph}
         size={focused ? 25 : 24}
         color={color}
-        style={focused ? styles.iconFocused : styles.icon}
+        style={iconStyle}
       />
     </View>
   );

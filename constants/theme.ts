@@ -1,68 +1,88 @@
-import { gradient } from '@/constants/gradient';
+import { appBackground } from '@/constants/gradient';
 
 export const colors = {
-  background: gradient.base,
+  background: appBackground,
   backgroundTransparent: 'transparent',
 
-  textPrimary: '#FFFFFF',
-  textSecondary: 'rgba(255, 255, 255, 0.82)',
-  textMuted: 'rgba(255, 255, 255, 0.58)',
-
-  accentRose: '#C9A99A',
-  accentCobalt: '#8EB4C8',
-  /** Ruler picker center tick */
-  accentLime: '#C8E86A',
-
-  /** Partner / health metric accents on gradient */
-  heatLow: '#A8D4B0',
-  heatMedium: '#E0B89A',
-  heatHigh: '#D99A9A',
-  substancesNone: '#C8E86A',
-  loggedDot: '#C8E86A',
-
-  surface: 'rgba(255, 255, 255, 0.06)',
-
-  cardUnselectedBg: 'rgba(255, 255, 255, 0.05)',
-  cardUnselectedBorder: 'rgba(255, 255, 255, 0.2)',
-  cardSelectedBg: 'rgba(255, 255, 255, 0.1)',
-  cardSelectedBorder: 'rgba(255, 255, 255, 0.28)',
-
-  pillUnselectedBg: 'rgba(255, 255, 255, 0.05)',
-  pillSelectedBg: 'rgba(255, 255, 255, 0.1)',
-
-  buttonPrimaryBg: 'rgba(255, 255, 255, 0.12)',
-  buttonGhostBorder: 'rgba(255, 255, 255, 0.28)',
-
-  inputBg: 'rgba(255, 255, 255, 0.06)',
-  inputBorder: 'rgba(255, 255, 255, 0.2)',
-  inputBorderFocused: 'rgba(255, 255, 255, 0.45)',
-
-  avatarBg: 'rgba(255, 255, 255, 0.1)',
-  white: '#FFFFFF',
-};
-
-/** Non-carrying partner Track dashboard (light mist surface) */
-export const partnerDashboard = {
-  background: '#E8ECEE',
   textPrimary: '#1A2422',
   textSecondary: 'rgba(26, 36, 34, 0.65)',
   textMuted: 'rgba(26, 36, 34, 0.45)',
-  progressTrack: 'rgba(26, 36, 34, 0.08)',
-  progressFill: '#1A2422',
-  streakBg: '#1A2422',
-  streakText: '#FFFFFF',
-  cardBorder: 'rgba(255, 255, 255, 0.4)',
-  loggedDot: '#7BAF8A',
+
+  accentRose: '#C9A99A',
+  accentCobalt: '#6B8FA8',
+  /** Ruler picker center tick */
+  accentLime: '#5A8F4A',
+
   heatLow: '#7BAF8A',
   heatMedium: '#C4947A',
   heatHigh: '#C17B7B',
   substancesNone: '#7BAF8A',
-  decoration: 'rgba(26, 36, 34, 0.06)',
-  decorationStrong: 'rgba(26, 36, 34, 0.08)',
-  sheetHandle: 'rgba(26, 36, 34, 0.15)',
-  selectedBg: '#1A2422',
-  selectedText: '#FFFFFF',
+  loggedDot: '#7BAF8A',
+
+  surface: 'rgba(26, 36, 34, 0.06)',
+
+  cardUnselectedBg: 'rgba(255, 255, 255, 0.42)',
+  cardUnselectedBorder: 'rgba(255, 255, 255, 0.55)',
+  cardSelectedBg: 'rgba(255, 255, 255, 0.65)',
+  cardSelectedBorder: 'rgba(26, 36, 34, 0.18)',
+
+  pillUnselectedBg: '#FFFFFF',
+  pillSelectedBg: '#1A2422',
+
+  buttonPrimaryBg: '#1A2422',
+  buttonGhostBorder: 'rgba(26, 36, 34, 0.22)',
+
   inputBg: '#FFFFFF',
+  inputBorder: 'rgba(26, 36, 34, 0.12)',
+  inputBorderFocused: 'rgba(26, 36, 34, 0.35)',
+
+  avatarBg: 'rgba(255, 255, 255, 0.55)',
+  white: '#FFFFFF',
+};
+
+/** Connect tab — glass on flat light blue */
+export const connectDashboard = {
+  background: colors.backgroundTransparent,
+  textPrimary: colors.textPrimary,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+  progressTrack: colors.surface,
+  progressFill: colors.textPrimary,
+  cardBorder: colors.cardUnselectedBorder,
+  cardBorderStrong: colors.cardSelectedBorder,
+  sage: colors.heatLow,
+  buttonBg: colors.buttonPrimaryBg,
+  buttonText: colors.white,
+  inputBg: colors.inputBg,
+  decoration: 'rgba(26, 36, 34, 0.06)',
+  sheetHandle: 'rgba(26, 36, 34, 0.15)',
+  calendarSelectedBg: colors.white,
+  calendarSelectedText: colors.textPrimary,
+};
+
+/** Partner Track — same flat surface as the rest of the app */
+export const partnerDashboard = {
+  background: appBackground,
+  textPrimary: colors.textPrimary,
+  textSecondary: colors.textSecondary,
+  textMuted: colors.textMuted,
+  progressTrack: colors.surface,
+  progressFill: colors.textPrimary,
+  streakBg: colors.textPrimary,
+  streakText: colors.white,
+  cardBorder: connectDashboard.cardBorder,
+  cardBorderStrong: connectDashboard.cardBorderStrong,
+  loggedDot: colors.loggedDot,
+  heatLow: colors.heatLow,
+  heatMedium: colors.heatMedium,
+  heatHigh: colors.heatHigh,
+  substancesNone: colors.substancesNone,
+  decoration: connectDashboard.decoration,
+  decorationStrong: 'rgba(26, 36, 34, 0.08)',
+  sheetHandle: connectDashboard.sheetHandle,
+  selectedBg: colors.textPrimary,
+  selectedText: colors.white,
+  inputBg: colors.inputBg,
   quickPillBg: 'rgba(255, 255, 255, 0.55)',
 };
 
@@ -74,12 +94,7 @@ export const fonts = {
   semiBold: 'Geist_600SemiBold',
 } as const;
 
-/** Keeps white type readable on the light end of Monsoon Glow */
-export const textContrast = {
-  textShadowColor: 'rgba(48, 82, 130, 0.5)',
-  textShadowOffset: { width: 0, height: 1 } as const,
-  textShadowRadius: 8,
-};
+export const textContrast = {} as const;
 
 export const fontSizes = {
   display: 44,
@@ -119,31 +134,23 @@ export const spacing = {
 };
 
 export const typography = {
-  /** Headlines */
   headline: {
     fontFamily: fonts.semiBold,
     letterSpacing: 0.2,
     color: colors.textPrimary,
-    ...textContrast,
   },
-  /** Body / subtext */
   subtext: {
     fontFamily: fonts.regular,
     color: colors.textSecondary,
     lineHeight: 24,
-    ...textContrast,
   },
-  /** Large display numbers */
   display: {
     fontFamily: fonts.light,
     color: colors.textPrimary,
-    ...textContrast,
   },
-  /** Labels / caps */
   label: {
     fontFamily: fonts.medium,
     color: colors.textMuted,
-    ...textContrast,
   },
   wordmark: {
     fontSize: fontSizes.wordmark,
@@ -151,6 +158,5 @@ export const typography = {
     letterSpacing: 5,
     color: colors.textMuted,
     textTransform: 'uppercase' as const,
-    ...textContrast,
   },
 };

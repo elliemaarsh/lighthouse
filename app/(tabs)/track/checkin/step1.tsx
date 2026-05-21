@@ -7,6 +7,8 @@ import { GlassPillOption } from '@/components/GlassPillOption';
 import { useCheckIn } from '@/contexts/CheckInContext';
 import { checkInSpacing } from '@/constants/checkIn';
 import { routes } from '@/constants/routes';
+import { fetchDailyLogForToday } from '@/lib/dailyLogs';
+import { ensureLocalUserId } from '@/lib/localUserId';
 import { colors, fontSizes } from '@/constants/theme';
 import type { PeriodStatus } from '@/types/checkIn';
 
@@ -20,11 +22,30 @@ const OPTIONS: { index: string; label: string; value: PeriodStatus }[] = [
 export default function CheckInStep1() {
   const { data, update, reset } = useCheckIn();
   const [selected, setSelected] = useState<PeriodStatus | null>(data.periodStatus);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    reset();
-    setSelected(null);
-  }, [reset]);
+    let cancelled = false;
+
+    void (async () => {
+      const { data: existing } = await fetchDailyLogForToday(ensureLocalUserId());
+      if (cancelled) return;
+
+      if (existing) {
+        const { date: _date, ...rest } = existing;
+        update(rest);
+        setSelected(rest.periodStatus);
+      } else {
+        reset();
+        setSelected(null);
+      }
+      setReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reset, update]);
 
   const handleSelect = (value: PeriodStatus) => {
     setSelected(value);
@@ -39,6 +60,10 @@ export default function CheckInStep1() {
     update({ periodStatus: null });
     router.push(routes.checkinStep2);
   };
+
+  if (!ready) {
+    return null;
+  }
 
   return (
     <CheckInStepLayout

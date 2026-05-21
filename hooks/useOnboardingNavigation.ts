@@ -5,16 +5,8 @@ import { routes } from '@/constants/routes';
 import { isClient } from '@/lib/storage';
 import { useUserStore } from '@/store/useUserStore';
 
-const ONBOARDING_SCREENS = new Set([
-  'onboarding',
-  'name',
-  'role',
-  'journey',
-  'partner',
-]);
-
 function isOnboardingRoute(root: string | undefined) {
-  return root === undefined || (root !== undefined && ONBOARDING_SCREENS.has(root));
+  return root === undefined || root === 'onboarding';
 }
 
 /**
@@ -65,7 +57,7 @@ export function useOnboardingNavigation() {
     }
 
     if (!hasCompletedOnboarding && inTabs) {
-      router.replace(routes.welcome);
+      router.replace('/onboarding/splash');
     }
   }, [hasCompletedOnboarding, navigationState?.key, router, segments, storeReady]);
 }

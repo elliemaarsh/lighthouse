@@ -44,13 +44,15 @@ export function DataMetricCard({
           tone="dark"
           placement="background"
         />
-        <View style={styles.textStack}>
-          <Text style={styles.label}>{label}</Text>
+        <View style={[styles.textStack, !isHero && styles.textStackCompact]}>
+          <Text style={styles.label} numberOfLines={2}>
+            {label}
+          </Text>
           <Text style={[styles.value, isHero && styles.valueHero]} numberOfLines={2}>
             {value}
           </Text>
           {subtitle ? (
-            <Text style={styles.subtitle} numberOfLines={2}>
+            <Text style={styles.subtitle} numberOfLines={3}>
               {subtitle}
             </Text>
           ) : null}
@@ -69,7 +71,7 @@ const styles = StyleSheet.create({
   compact: {
     flex: 1,
     minWidth: 0,
-    minHeight: 140,
+    minHeight: 152,
   },
   inner: {
     minHeight: 140,
@@ -85,6 +87,11 @@ const styles = StyleSheet.create({
     zIndex: 2,
     justifyContent: 'flex-end',
     maxWidth: '72%',
+  },
+  textStackCompact: {
+    padding: 16,
+    paddingTop: 22,
+    maxWidth: '100%',
   },
   label: {
     fontSize: 10,

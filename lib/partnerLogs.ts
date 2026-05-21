@@ -1,57 +1,72 @@
+import {
+  loadLocalPartnerLog,
+  saveLocalPartnerLog,
+  touchPartnerLogDate,
+} from '@/lib/checkInStorage';
+import { getTodayDateString } from '@/lib/date';
+import { ensureLocalUserId } from '@/lib/localUserId';
+import { countLoggedCategories } from '@/lib/partnerDisplay';
 import { supabase } from '@/lib/supabase';
 import type { PartnerLogData } from '@/types/partnerLog';
 
-export function getTodayDateString(): string {
-  return new Date().toISOString().split('T')[0];
+export { getTodayDateString } from '@/lib/date';
+
+function rowToPartnerLog(row: Record<string, unknown>): PartnerLogData {
+  return {
+    sleepHours: (row.sleep_hours as number | null) ?? null,
+    sleepMinutes: (row.sleep_minutes as number | null) ?? null,
+    exerciseActive: (row.exercise_active as boolean | null) ?? null,
+    exerciseMinutes: (row.exercise_minutes as number | null) ?? null,
+    exerciseTypes: (row.exercise_types as string[]) ?? [],
+    heatLevel: (row.heat_level as PartnerLogData['heatLevel']) ?? null,
+    substances: (row.substances as string[]) ?? [],
+    alcoholDrinks: (row.alcohol_drinks as number | null) ?? null,
+    stressLevel: (row.stress_level as number | null) ?? null,
+    notes: (row.notes as string) ?? '',
+  };
 }
 
 export async function fetchPartnerLogForToday(
   userId: string | null,
 ): Promise<{ data: PartnerLogData | null; error: Error | null }> {
-  if (!userId) {
-    return { data: null, error: null };
-  }
+  const uid = userId ?? ensureLocalUserId();
+  const date = getTodayDateString();
+  const local = await loadLocalPartnerLog(uid, date);
 
   const { data, error } = await supabase
     .from('partner_logs')
     .select('*')
-    .eq('user_id', userId)
-    .eq('date', getTodayDateString())
+    .eq('user_id', uid)
+    .eq('date', date)
     .maybeSingle();
 
   if (error) {
-    console.error('[Lighthouse] Failed to fetch partner log:', error.message);
-    return { data: null, error: new Error(error.message) };
+    console.warn('[Lighthouse] partner_logs fetch:', error.message);
+    return { data: local, error: local ? null : new Error(error.message) };
   }
 
   if (!data) {
-    return { data: null, error: null };
+    return { data: local, error: null };
   }
 
-  return {
-    data: {
-      sleepHours: data.sleep_hours ?? null,
-      sleepMinutes: data.sleep_minutes ?? null,
-      exerciseActive: data.exercise_active ?? null,
-      exerciseMinutes: data.exercise_minutes ?? null,
-      exerciseTypes: data.exercise_types ?? [],
-      heatLevel: data.heat_level ?? null,
-      substances: data.substances ?? [],
-      alcoholDrinks: data.alcohol_drinks ?? null,
-      stressLevel: data.stress_level ?? null,
-      notes: data.notes ?? '',
-    },
-    error: null,
-  };
+  return { data: rowToPartnerLog(data), error: null };
 }
 
 export async function savePartnerLog(
   userId: string | null,
   data: PartnerLogData,
 ): Promise<{ error: Error | null }> {
+  const uid = userId ?? ensureLocalUserId();
+  const date = getTodayDateString();
+
+  await saveLocalPartnerLog(uid, data, date);
+  if (countLoggedCategories(data) > 0) {
+    await touchPartnerLogDate(uid, date);
+  }
+
   const payload = {
-    user_id: userId,
-    date: getTodayDateString(),
+    user_id: uid,
+    date,
     sleep_hours: data.sleepHours,
     sleep_minutes: data.sleepMinutes,
     exercise_active: data.exerciseActive,
@@ -69,8 +84,8 @@ export async function savePartnerLog(
   });
 
   if (error) {
-    console.error('[Lighthouse] Failed to save partner log:', error.message);
-    return { error: new Error(error.message) };
+    console.warn('[Lighthouse] partner_logs save (local ok):', error.message);
+    return { error: null };
   }
 
   return { error: null };

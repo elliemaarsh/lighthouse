@@ -17,6 +17,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AppRootBackground } from '@/components/AppRootBackground';
 import { colors } from '@/constants/theme';
 import { useOnboardingNavigation } from '@/hooks/useOnboardingNavigation';
+import { ensureLocalUserId } from '@/lib/localUserId';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -37,6 +38,10 @@ export default function RootLayout() {
   });
 
   useOnboardingNavigation();
+
+  useEffect(() => {
+    ensureLocalUserId();
+  }, []);
 
   useEffect(() => {
     if ((fontsLoaded || fontError) && Platform.OS !== 'web') {
@@ -64,6 +69,7 @@ export default function RootLayout() {
           <Stack.Screen name="role" />
           <Stack.Screen name="journey" />
           <Stack.Screen name="partner" />
+          <Stack.Screen name="settings" />
           <Stack.Screen name="(tabs)" />
         </Stack>
       </View>

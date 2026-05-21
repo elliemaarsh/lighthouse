@@ -2,6 +2,26 @@ import { STRESS_LEVELS } from '@/constants/partner';
 import { colors } from '@/constants/theme';
 import type { HeatLevel, PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
 
+/** First name for copy — falls back to "your partner" when unknown */
+export function partnerFirstName(
+  partnerName: string | null | undefined,
+  partnerEmail?: string,
+): string {
+  const trimmed = partnerName?.trim();
+  if (trimmed) return trimmed;
+
+  const email = partnerEmail?.trim();
+  if (email) {
+    const local = email.split('@')[0]?.trim();
+    if (local) {
+      const first = local.split(/[._-]/)[0] ?? local;
+      return first.charAt(0).toUpperCase() + first.slice(1);
+    }
+  }
+
+  return 'your partner';
+}
+
 export function isCategoryLogged(id: PartnerCategoryId, log: PartnerLogData): boolean {
   switch (id) {
     case 'sleep':

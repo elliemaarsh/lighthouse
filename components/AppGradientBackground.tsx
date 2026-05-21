@@ -1,62 +1,19 @@
-import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import {
-  type GradientLayer,
-  type GradientPreset,
-  type GradientVariant,
-  gradientPresets,
-  onboardingGradient,
-} from '@/constants/gradient';
+import { appBackground } from '@/constants/gradient';
 
 type AppGradientBackgroundProps = {
   children?: ReactNode;
   style?: StyleProp<ViewStyle>;
-  variant?: GradientVariant;
 };
 
-function isLayeredPreset(
-  preset: GradientPreset | typeof onboardingGradient,
-): preset is GradientPreset {
-  return 'layers' in preset;
-}
-
-function GradientLayerView({ layer }: { layer: GradientLayer }) {
+export function AppGradientBackground({ children, style }: AppGradientBackgroundProps) {
   return (
-    <LinearGradient
-      colors={[...layer.colors]}
-      locations={layer.locations ? [...layer.locations] : undefined}
-      start={layer.start}
-      end={layer.end}
-      style={StyleSheet.absoluteFill}
-      pointerEvents="none"
-    />
-  );
-}
-
-export function AppGradientBackground({
-  children,
-  style,
-  variant = 'onboarding',
-}: AppGradientBackgroundProps) {
-  const preset = gradientPresets[variant];
-  const baseColor = isLayeredPreset(preset) ? preset.base : preset.base;
-
-  return (
-    <View style={[styles.root, { backgroundColor: baseColor }, style]} pointerEvents="box-none">
-      {variant === 'onboarding' || !isLayeredPreset(preset) ? (
-        <LinearGradient
-          colors={[...onboardingGradient.colors]}
-          locations={[...onboardingGradient.locations]}
-          start={onboardingGradient.start}
-          end={onboardingGradient.end}
-          style={StyleSheet.absoluteFill}
-          pointerEvents="none"
-        />
-      ) : (
-        preset.layers.map((layer, i) => <GradientLayerView key={i} layer={layer} />)
-      )}
+    <View
+      style={[styles.root, { backgroundColor: appBackground }, style]}
+      pointerEvents="box-none"
+    >
       {children}
     </View>
   );

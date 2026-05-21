@@ -1,17 +1,22 @@
+import { fetchLocalPartnerStreak } from '@/lib/checkInStorage';
+import { ensureLocalUserId } from '@/lib/localUserId';
 import { supabase } from '@/lib/supabase';
 
 /** Consecutive calendar days with a partner log (including today if logged). */
 export async function fetchPartnerStreak(userId: string | null): Promise<number> {
-  if (!userId || !supabase) return 0;
+  const uid = userId ?? ensureLocalUserId();
+  const localStreak = await fetchLocalPartnerStreak(uid);
 
   const { data, error } = await supabase
     .from('partner_logs')
     .select('date')
-    .eq('user_id', userId)
+    .eq('user_id', uid)
     .order('date', { ascending: false })
     .limit(60);
 
-  if (error || !data?.length) return 0;
+  if (error || !data?.length) {
+    return localStreak;
+  }
 
   const dates = new Set(data.map((row) => row.date as string));
   let streak = 0;
@@ -25,5 +30,5 @@ export async function fetchPartnerStreak(userId: string | null): Promise<number>
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  return streak;
+  return Math.max(streak, localStreak);
 }

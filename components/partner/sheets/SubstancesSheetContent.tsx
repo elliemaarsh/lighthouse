@@ -57,6 +57,7 @@ export function SubstancesSheetContent({ log, onSave }: SubstancesSheetContentPr
             label={item}
             selected={selected.includes(item)}
             onPress={() => toggle(item)}
+            tone="partner"
           />
         ))}
       </View>
