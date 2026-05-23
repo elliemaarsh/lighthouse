@@ -53,6 +53,7 @@ import {
   typography,
 } from '@/constants/theme';
 import type { PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
+import { useStoreHydrated } from '@/hooks/useStoreHydrated';
 import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
 import { useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
@@ -63,6 +64,7 @@ const TOTAL_CATEGORIES = 6;
 const PARTNER_GRID_ROW_EXTRA = 152;
 
 export default function PartnerTrackScreen() {
+  const storeReady = useStoreHydrated();
   const userId = useUserStore((s) => s.userId);
   const scrollBottomPad = useTabBarScrollPadding({ extra: PARTNER_GRID_ROW_EXTRA });
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
@@ -72,21 +74,25 @@ export default function PartnerTrackScreen() {
   const sheetRef = useRef<BottomSheetModal>(null);
 
   const loadToday = useCallback(async () => {
-    const uid = userId ?? ensureLocalUserId();
+    if (!storeReady) return;
+    const uid = userId || ensureLocalUserId();
+    if (!uid) return;
+
     const [todayLog, streakDays] = await Promise.all([
       partnerLogSession.hydrate(uid),
       fetchPartnerStreak(uid),
     ]);
     setLog(todayLog);
     setStreak(streakDays);
-  }, [userId]);
+  }, [storeReady, userId]);
 
   useFocusEffect(
     useCallback(() => {
-      loadToday();
+      if (!storeReady) return;
+      void loadToday();
       setTabBarHidden(false);
       return () => setTabBarHidden(false);
-    }, [loadToday, setTabBarHidden]),
+    }, [loadToday, setTabBarHidden, storeReady]),
   );
 
   const loggedCount = countLoggedCategories(log);
@@ -107,7 +113,10 @@ export default function PartnerTrackScreen() {
   };
 
   const handleSaveCategory = async (patch: Partial<PartnerLogData>) => {
-    const uid = userId ?? ensureLocalUserId();
+    if (!storeReady) return;
+    const uid = userId || ensureLocalUserId();
+    if (!uid) return;
+
     const next = { ...partnerLogSession.getToday(), ...patch };
     partnerLogSession.setToday(next);
     setLog(next);
@@ -117,10 +126,11 @@ export default function PartnerTrackScreen() {
   };
 
   const handleTrainingToggle = (on: boolean) => {
+    const current = partnerLogSession.getToday();
     void handleSaveCategory({
       exerciseActive: on,
-      exerciseMinutes: on ? (log.exerciseMinutes ?? 30) : null,
-      exerciseTypes: on ? log.exerciseTypes : [],
+      exerciseMinutes: on ? (current.exerciseMinutes ?? 30) : null,
+      exerciseTypes: on ? current.exerciseTypes : [],
     });
   };
 

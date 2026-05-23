@@ -1,3 +1,4 @@
+import { isClient } from '@/lib/storage';
 import { useUserStore } from '@/store/useUserStore';
 
 function generateLocalUserId(): string {
@@ -15,6 +16,14 @@ function generateLocalUserId(): string {
 export function ensureLocalUserId(): string {
   const existing = useUserStore.getState().userId;
   if (existing) return existing;
+
+  // Creating an id before rehydration can orphan AsyncStorage logs when the real userId loads.
+  if (isClient && !useUserStore.persist.hasHydrated()) {
+    console.warn(
+      '[Lighthouse] ensureLocalUserId called before store hydration — wait for useStoreHydrated()',
+    );
+    return existing ?? '';
+  }
 
   const id = generateLocalUserId();
   useUserStore.getState().setUserId(id);

@@ -1,3 +1,4 @@
+import { countLoggedCategories } from '@/lib/partnerDisplay';
 import { fetchPartnerLogForToday } from '@/lib/partnerLogs';
 import { ensureLocalUserId } from '@/lib/localUserId';
 import { initialPartnerLog } from '@/types/partnerLog';
@@ -12,9 +13,20 @@ export const partnerLogSession = {
     todayPartnerLog = log;
   },
   async hydrate(userId: string | null): Promise<PartnerLogData> {
-    const uid = userId ?? ensureLocalUserId();
+    const uid = userId || ensureLocalUserId();
+    if (!uid) return todayPartnerLog;
+
     const { data } = await fetchPartnerLogForToday(uid);
-    todayPartnerLog = data ?? initialPartnerLog;
+    const resolved = data ?? initialPartnerLog;
+
+    if (
+      countLoggedCategories(resolved) === 0 &&
+      countLoggedCategories(todayPartnerLog) > 0
+    ) {
+      return todayPartnerLog;
+    }
+
+    todayPartnerLog = resolved;
     return todayPartnerLog;
   },
 };

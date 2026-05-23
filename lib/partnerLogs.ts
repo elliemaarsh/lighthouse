@@ -11,23 +11,23 @@ import type { PartnerLogData } from '@/types/partnerLog';
 
 export { getTodayDateString } from '@/lib/date';
 
-/** Combine remote row with local AsyncStorage — keeps fields the user saved on-device. */
+/** Combine remote row with local AsyncStorage — on-device log wins when both exist. */
 export function mergePartnerLogs(
   local: PartnerLogData | null,
   remote: PartnerLogData,
 ): PartnerLogData {
   if (!local) return remote;
   return {
-    sleepHours: remote.sleepHours ?? local.sleepHours,
-    sleepMinutes: remote.sleepMinutes ?? local.sleepMinutes,
-    exerciseActive: remote.exerciseActive ?? local.exerciseActive,
-    exerciseMinutes: remote.exerciseMinutes ?? local.exerciseMinutes,
-    exerciseTypes: remote.exerciseTypes.length ? remote.exerciseTypes : local.exerciseTypes,
-    heatLevel: remote.heatLevel ?? local.heatLevel,
-    substances: remote.substances.length ? remote.substances : local.substances,
-    alcoholDrinks: remote.alcoholDrinks ?? local.alcoholDrinks,
-    stressLevel: remote.stressLevel ?? local.stressLevel,
-    notes: remote.notes.trim() ? remote.notes : local.notes,
+    sleepHours: local.sleepHours ?? remote.sleepHours,
+    sleepMinutes: local.sleepMinutes ?? remote.sleepMinutes,
+    exerciseActive: local.exerciseActive ?? remote.exerciseActive,
+    exerciseMinutes: local.exerciseMinutes ?? remote.exerciseMinutes,
+    exerciseTypes: local.exerciseTypes.length ? local.exerciseTypes : remote.exerciseTypes,
+    heatLevel: local.heatLevel ?? remote.heatLevel,
+    substances: local.substances.length ? local.substances : remote.substances,
+    alcoholDrinks: local.alcoholDrinks ?? remote.alcoholDrinks,
+    stressLevel: local.stressLevel ?? remote.stressLevel,
+    notes: local.notes.trim() ? local.notes : remote.notes,
   };
 }
 
