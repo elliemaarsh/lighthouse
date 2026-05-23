@@ -1,27 +1,33 @@
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
-import {
-  LEARN_FILTER_CHIPS,
-  type LearnFilterId,
-} from '@/constants/learn';
 import { colors, fonts } from '@/constants/theme';
 import { noFocusRing } from '@/lib/focusRing';
 
-type LearnFilterChipsProps = {
-  selected: LearnFilterId;
-  onSelect: (id: LearnFilterId) => void;
+export type CommunityTagChip = {
+  id: string;
+  label: string;
 };
 
-export function LearnFilterChips({ selected, onSelect }: LearnFilterChipsProps) {
+type CommunityTagChipsProps = {
+  chips: CommunityTagChip[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+};
+
+export function CommunityTagChips({
+  chips,
+  selectedId,
+  onSelect,
+}: CommunityTagChipsProps) {
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.row}
       style={styles.scroll}
+      contentContainerStyle={styles.row}
     >
-      {LEARN_FILTER_CHIPS.map((chip) => {
-        const active = chip.id === selected;
+      {chips.map((chip) => {
+        const active = chip.id === selectedId;
         return (
           <Pressable
             key={chip.id}
@@ -42,12 +48,13 @@ const styles = StyleSheet.create({
   scroll: {
     flexGrow: 0,
     flexShrink: 0,
-    marginTop: 16,
-    marginBottom: 8,
+    marginTop: 12,
+    marginBottom: 12,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: 24,
     paddingRight: 8,
     gap: 8,
   },
@@ -58,6 +65,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: 'rgba(26, 36, 34, 0.1)',
+    alignSelf: 'center',
   },
   chipSelected: {
     backgroundColor: colors.textPrimary,
@@ -67,6 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: fonts.medium,
     color: colors.textSecondary,
+    lineHeight: 18,
   },
   chipLabelSelected: {
     color: colors.white,

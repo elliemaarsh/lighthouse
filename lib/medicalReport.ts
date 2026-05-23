@@ -185,47 +185,61 @@ export function buildMedicalReportHtml(input: MedicalReportInput): string {
 <head>
 <meta charset="utf-8" />
 <style>
+  * {
+    color: #000000;
+  }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, Arial, sans-serif;
     padding: 40px;
-    color: #1A2422;
+    color: #000000;
     max-width: 800px;
     margin: 0 auto;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   h1 {
     font-size: 28px;
-    font-weight: 600;
+    font-weight: 700;
+    color: #000000;
     margin-bottom: 4px;
   }
   h2 {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 2px;
-    color: #6B7E7A;
+    color: #000000;
     margin-top: 32px;
     margin-bottom: 12px;
-    border-bottom: 1px solid #E8ECEE;
+    border-bottom: 1px solid #000000;
     padding-bottom: 8px;
   }
   .meta {
     font-size: 13px;
-    color: #6B7E7A;
+    color: #000000;
     margin-bottom: 32px;
   }
   .stat-row {
     display: flex;
     justify-content: space-between;
     padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #000000;
     font-size: 14px;
     gap: 16px;
+    color: #000000;
   }
-  .stat-label { color: #6B7E7A; flex-shrink: 0; }
-  .stat-value { font-weight: 500; text-align: right; }
+  .stat-label {
+    color: #000000;
+    flex-shrink: 0;
+  }
+  .stat-value {
+    color: #000000;
+    font-weight: 600;
+    text-align: right;
+  }
   .note {
     font-size: 12px;
-    color: #9BB0AC;
+    color: #000000;
     margin-top: 48px;
     text-align: center;
     font-style: italic;

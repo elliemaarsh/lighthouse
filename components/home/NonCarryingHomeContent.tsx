@@ -14,7 +14,7 @@ import { partnerFeelingFromLog } from '@/lib/partnerFeeling';
 import { partnerFirstName } from '@/lib/partnerDisplay';
 import { partnerPossessiveLabel, partnerPronouns } from '@/lib/partnerPronouns';
 import { fetchPartnerDailyCheckIn } from '@/lib/partnerSharedLog';
-import { fetchPartnerLogForToday } from '@/lib/partnerLogs';
+import { partnerLogSession } from '@/lib/partnerLogSession';
 import { useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
 import type { PartnerLogData } from '@/types/partnerLog';
@@ -43,10 +43,10 @@ export function NonCarryingHomeContent() {
   const load = useCallback(async () => {
     const [daily, mine] = await Promise.all([
       fetchPartnerDailyCheckIn(partnerUserId),
-      fetchPartnerLogForToday(userId),
+      partnerLogSession.hydrate(userId),
     ]);
     setPartnerDaily(daily);
-    setMyPartnerLog(mine.data);
+    setMyPartnerLog(mine);
   }, [partnerUserId, userId]);
 
   useFocusEffect(
@@ -61,11 +61,13 @@ export function NonCarryingHomeContent() {
   const feeling = partnerFeelingFromLog(partnerDaily, pronouns);
 
   const loggedCategories =
-    myPartnerLog &&
+    myPartnerLog != null &&
     (myPartnerLog.sleepHours != null ||
       myPartnerLog.heatLevel != null ||
       myPartnerLog.stressLevel != null ||
-      myPartnerLog.exerciseActive != null);
+      myPartnerLog.exerciseActive != null ||
+      myPartnerLog.substances.length > 0 ||
+      myPartnerLog.notes.trim().length > 0);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>

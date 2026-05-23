@@ -67,6 +67,8 @@ type UserState = {
   /** Display name for partner — placeholder until linking ships */
   partnerName: string | null;
   hasCompletedOnboarding: boolean;
+  communityUsername: string | null;
+  hasSetUpCommunity: boolean;
   setUserId: (userId: string | null) => void;
   setName: (name: string) => void;
   /** @deprecated Use setName */
@@ -92,6 +94,9 @@ type UserState = {
   setPartnerUserId: (partnerUserId: string | null) => void;
   setLastPulseCheckDate: (lastPulseCheckDate: string | null) => void;
   setPartnerName: (partnerName: string | null) => void;
+  setCommunityUsername: (communityUsername: string | null) => void;
+  setHasSetUpCommunity: (hasSetUpCommunity: boolean) => void;
+  completeCommunitySetup: (username: string) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
 };
@@ -120,6 +125,8 @@ const initialState = {
   lastPulseCheckDate: null as string | null,
   partnerName: null as string | null,
   hasCompletedOnboarding: false,
+  communityUsername: null as string | null,
+  hasSetUpCommunity: false,
 };
 
 export const useUserStore = create<UserState>()(
@@ -194,6 +201,13 @@ export const useUserStore = create<UserState>()(
       setPartnerUserId: (partnerUserId) => set({ partnerUserId }),
       setLastPulseCheckDate: (lastPulseCheckDate) => set({ lastPulseCheckDate }),
       setPartnerName: (partnerName) => set({ partnerName }),
+      setCommunityUsername: (communityUsername) => set({ communityUsername }),
+      setHasSetUpCommunity: (hasSetUpCommunity) => set({ hasSetUpCommunity }),
+      completeCommunitySetup: (username) =>
+        set({
+          communityUsername: username,
+          hasSetUpCommunity: true,
+        }),
       completeOnboarding: () => {
         const state = get();
         const journeyType =

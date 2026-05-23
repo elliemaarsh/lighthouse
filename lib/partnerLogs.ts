@@ -11,6 +11,26 @@ import type { PartnerLogData } from '@/types/partnerLog';
 
 export { getTodayDateString } from '@/lib/date';
 
+/** Combine remote row with local AsyncStorage — keeps fields the user saved on-device. */
+export function mergePartnerLogs(
+  local: PartnerLogData | null,
+  remote: PartnerLogData,
+): PartnerLogData {
+  if (!local) return remote;
+  return {
+    sleepHours: remote.sleepHours ?? local.sleepHours,
+    sleepMinutes: remote.sleepMinutes ?? local.sleepMinutes,
+    exerciseActive: remote.exerciseActive ?? local.exerciseActive,
+    exerciseMinutes: remote.exerciseMinutes ?? local.exerciseMinutes,
+    exerciseTypes: remote.exerciseTypes.length ? remote.exerciseTypes : local.exerciseTypes,
+    heatLevel: remote.heatLevel ?? local.heatLevel,
+    substances: remote.substances.length ? remote.substances : local.substances,
+    alcoholDrinks: remote.alcoholDrinks ?? local.alcoholDrinks,
+    stressLevel: remote.stressLevel ?? local.stressLevel,
+    notes: remote.notes.trim() ? remote.notes : local.notes,
+  };
+}
+
 function rowToPartnerLog(row: Record<string, unknown>): PartnerLogData {
   return {
     sleepHours: (row.sleep_hours as number | null) ?? null,
@@ -49,7 +69,7 @@ export async function fetchPartnerLogForToday(
     return { data: local, error: null };
   }
 
-  return { data: rowToPartnerLog(data), error: null };
+  return { data: mergePartnerLogs(local, rowToPartnerLog(data)), error: null };
 }
 
 export async function savePartnerLog(

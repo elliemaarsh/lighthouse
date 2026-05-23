@@ -42,7 +42,8 @@ import {
   isCategoryLogged,
 } from '@/lib/partnerDisplay';
 import { ensureLocalUserId } from '@/lib/localUserId';
-import { fetchPartnerLogForToday, savePartnerLog } from '@/lib/partnerLogs';
+import { partnerLogSession } from '@/lib/partnerLogSession';
+import { savePartnerLog } from '@/lib/partnerLogs';
 import { fetchPartnerStreak } from '@/lib/partnerStreak';
 import {
   colors,
@@ -51,7 +52,6 @@ import {
   textContrast,
   typography,
 } from '@/constants/theme';
-import { initialPartnerLog } from '@/types/partnerLog';
 import type { PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
 import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
 import { useTabBarStore } from '@/store/useTabBarStore';
@@ -66,18 +66,18 @@ export default function PartnerTrackScreen() {
   const userId = useUserStore((s) => s.userId);
   const scrollBottomPad = useTabBarScrollPadding({ extra: PARTNER_GRID_ROW_EXTRA });
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
-  const [log, setLog] = useState<PartnerLogData>(initialPartnerLog);
+  const [log, setLog] = useState<PartnerLogData>(() => partnerLogSession.getToday());
   const [streak, setStreak] = useState(0);
   const [activeCategory, setActiveCategory] = useState<PartnerCategoryId | null>(null);
   const sheetRef = useRef<BottomSheetModal>(null);
 
   const loadToday = useCallback(async () => {
     const uid = userId ?? ensureLocalUserId();
-    const [{ data }, streakDays] = await Promise.all([
-      fetchPartnerLogForToday(uid),
+    const [todayLog, streakDays] = await Promise.all([
+      partnerLogSession.hydrate(uid),
       fetchPartnerStreak(uid),
     ]);
-    setLog(data ?? initialPartnerLog);
+    setLog(todayLog);
     setStreak(streakDays);
   }, [userId]);
 
@@ -108,7 +108,8 @@ export default function PartnerTrackScreen() {
 
   const handleSaveCategory = async (patch: Partial<PartnerLogData>) => {
     const uid = userId ?? ensureLocalUserId();
-    const next = { ...log, ...patch };
+    const next = { ...partnerLogSession.getToday(), ...patch };
+    partnerLogSession.setToday(next);
     setLog(next);
     await savePartnerLog(uid, next);
     const streakDays = await fetchPartnerStreak(uid);

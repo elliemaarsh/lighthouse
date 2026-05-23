@@ -16,7 +16,7 @@ import type { PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
 type PartnerLogSheetProps = {
   category: PartnerCategoryId | null;
   log: PartnerLogData;
-  onSaveCategory: (patch: Partial<PartnerLogData>) => void;
+  onSaveCategory: (patch: Partial<PartnerLogData>) => void | Promise<void>;
   onDismiss: () => void;
 };
 
@@ -46,8 +46,8 @@ export const PartnerLogSheet = forwardRef<BottomSheetModal, PartnerLogSheetProps
     const snapPoints = useMemo(() => ['72%', '90%'], []);
 
     const handleSave = useCallback(
-      (patch: Partial<PartnerLogData>) => {
-        onSaveCategory(patch);
+      async (patch: Partial<PartnerLogData>) => {
+        await onSaveCategory(patch);
         if (ref && 'current' in ref && ref.current) {
           ref.current.dismiss();
         }

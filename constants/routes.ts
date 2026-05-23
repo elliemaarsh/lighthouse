@@ -22,5 +22,9 @@ export const routes = {
   learn: '/(tabs)/learn' as Href,
   learnArticle: '/(tabs)/learn/article' as Href,
   trackExport: '/(tabs)/track/export' as Href,
+  community: '/(tabs)/community' as Href,
+  communitySetup: '/(tabs)/community/setup' as Href,
+  communityPost: '/(tabs)/community/post' as Href,
+  communityNewPost: '/(tabs)/community/new-post' as Href,
   settings: '/settings' as Href,
 } as const;
