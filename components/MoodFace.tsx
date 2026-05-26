@@ -2,8 +2,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 
 import { noFocusRing } from '@/lib/focusRing';
 
-const FEATURE = '#FFFFFF';
-const FEATURE_SELECTED = '#1A2422';
+const FEATURE_UNSELECTED = 'rgba(26, 36, 34, 0.52)';
+const FEATURE_SELECTED = '#1A1A1A';
 const SIZE = 56;
 const SIZE_SELECTED = 64;
 
@@ -47,8 +47,40 @@ function Eyes({ level, color }: { level: number; color: string }) {
   );
 }
 
+const DEFAULT_DISPLAY_SIZE = 48;
+
+type MoodFaceDisplayProps = {
+  level: 1 | 2 | 3 | 4 | 5;
+  size?: number;
+};
+
+/** Read-only mood face for summary cards */
+export function MoodFaceDisplay({ level, size = DEFAULT_DISPLAY_SIZE }: MoodFaceDisplayProps) {
+  const featureColor = FEATURE_SELECTED;
+  const circleRadius = size / 2;
+  const innerScale = size / DEFAULT_DISPLAY_SIZE;
+
+  return (
+    <View
+      style={[
+        styles.displayCircle,
+        {
+          width: size,
+          height: size,
+          borderRadius: circleRadius,
+        },
+      ]}
+    >
+      <View style={{ transform: [{ scale: innerScale }] }}>
+        <Eyes level={level} color={featureColor} />
+        <Mouth level={level} color={featureColor} />
+      </View>
+    </View>
+  );
+}
+
 export function MoodFace({ level, selected, onPress }: MoodFaceProps) {
-  const featureColor = selected ? FEATURE_SELECTED : FEATURE;
+  const featureColor = selected ? FEATURE_SELECTED : FEATURE_UNSELECTED;
   const circleSize = selected ? SIZE_SELECTED : SIZE;
   const circleRadius = circleSize / 2;
 
@@ -86,8 +118,8 @@ export function MoodFace({ level, selected, onPress }: MoodFaceProps) {
 
 const styles = StyleSheet.create({
   slot: {
-    width: SIZE_SELECTED,
-    height: SIZE_SELECTED,
+    width: SIZE_SELECTED + 8,
+    height: SIZE_SELECTED + 8,
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'visible',
@@ -100,21 +132,21 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   circle: {
-    backgroundColor: 'rgba(255, 255, 255, 0.12)',
+    backgroundColor: 'rgba(255, 255, 255, 0.55)',
     alignItems: 'center',
     justifyContent: 'center',
     paddingTop: 4,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.22)',
+    borderColor: '#FFFFFF',
   },
   circleSelected: {
     backgroundColor: '#FFFFFF',
-    borderColor: 'rgba(255, 255, 255, 0.5)',
+    borderColor: '#FFFFFF',
     shadowColor: '#000000',
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
   eyesRow: {
     flexDirection: 'row',
@@ -178,5 +210,13 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 10,
     borderBottomRightRadius: 10,
     marginTop: 2,
+  },
+  displayCircle: {
+    backgroundColor: '#FFFFFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingTop: 2,
+    borderWidth: 0.5,
+    borderColor: '#1A1A1A',
   },
 });

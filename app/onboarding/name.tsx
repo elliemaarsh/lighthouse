@@ -4,6 +4,7 @@ import { StyleSheet, TextInput, View } from 'react-native';
 
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
 import { onboardingTheme } from '@/app/onboarding/theme';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { fontSizes, fonts } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -47,14 +48,12 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   input: {
-    backgroundColor: onboardingTheme.inputBg,
+    ...inputFieldStyle,
     borderRadius: 100,
     paddingVertical: 16,
     paddingHorizontal: 22,
     fontSize: fontSizes.body,
     fontFamily: fonts.regular,
     color: onboardingTheme.textPrimary,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
 });

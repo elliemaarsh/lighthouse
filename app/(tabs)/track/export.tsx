@@ -17,7 +17,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PillButton } from '@/components/onboarding/PillButton';
-import { colors, fonts, spacing } from '@/constants/theme';
+import { colors, fontSizes, fonts, spacing, textContrast } from '@/constants/theme';
 import {
   buildMedicalReportHtml,
   type ReportSections,
@@ -223,8 +223,8 @@ export default function TrackExportScreen() {
         ) : (
           <PillButton
             label="Generate PDF"
+            tier={2}
             onPress={() => void generatePdf()}
-            variant="primary"
             style={styles.generateBtn}
           />
         )}
@@ -236,7 +236,7 @@ export default function TrackExportScreen() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.backgroundTransparent,
   },
   header: {
     flexDirection: 'row',
@@ -249,9 +249,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: colors.cardUnselectedBg,
-    borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.5,
+    borderColor: '#1A1A1A',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -263,14 +263,17 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontFamily: fonts.semiBold,
     color: colors.textPrimary,
+    ...textContrast,
   },
   subtitle: {
     fontSize: 14,
     fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginTop: 4,
+    ...textContrast,
   },
   scroll: {
+    paddingTop: 8,
     paddingHorizontal: spacing.lg,
     paddingBottom: 40,
   },
@@ -281,6 +284,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 24,
     marginBottom: 12,
+    ...textContrast,
   },
   sectionKickerSpaced: {
     marginTop: 28,
@@ -324,7 +328,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 20,
     borderWidth: 1,
-    borderColor: colors.inputBorder,
+    borderColor: colors.glassCardBorder,
+    marginBottom: 4,
   },
   checkRow: {
     flexDirection: 'row',
@@ -369,7 +374,8 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   generateBtn: {
-    marginTop: 28,
+    width: '100%',
     alignSelf: 'stretch',
+    marginTop: 32,
   },
 });

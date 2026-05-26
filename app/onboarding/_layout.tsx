@@ -25,14 +25,6 @@ export default function OnboardingLayout() {
       <Stack.Screen name="journey" />
       <Stack.Screen name="cycle" />
       <Stack.Screen name="fertility-history" />
-      <Stack.Screen
-        name="listen-carrying"
-        options={{ animation: 'fade' }}
-      />
-      <Stack.Screen
-        name="listen-non-carrying"
-        options={{ animation: 'fade' }}
-      />
       <Stack.Screen name="invite" />
     </Stack>
   );

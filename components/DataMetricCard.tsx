@@ -14,6 +14,7 @@ type DataMetricCardProps = {
   size?: 'hero' | 'compact';
   style?: StyleProp<ViewStyle>;
   footer?: ReactNode;
+  hideValue?: boolean;
 };
 
 export function DataMetricCard({
@@ -24,6 +25,7 @@ export function DataMetricCard({
   size = 'compact',
   style,
   footer,
+  hideValue = false,
 }: DataMetricCardProps) {
   const isHero = size === 'hero';
   const artWidth = isHero ? 260 : 200;
@@ -31,7 +33,7 @@ export function DataMetricCard({
 
   return (
     <GlassSurface
-      variant="data"
+      variant="light"
       borderRadius={glass.dataRadius}
       shadow="soft"
       style={[isHero ? styles.hero : styles.compact, style]}
@@ -41,16 +43,18 @@ export function DataMetricCard({
           type={art}
           width={artWidth}
           height={artHeight}
-          tone="dark"
+          tone="light"
           placement="background"
         />
         <View style={[styles.textStack, !isHero && styles.textStackCompact]}>
           <Text style={styles.label} numberOfLines={2}>
             {label}
           </Text>
-          <Text style={[styles.value, isHero && styles.valueHero]} numberOfLines={2}>
-            {value}
-          </Text>
+          {!hideValue ? (
+            <Text style={[styles.value, isHero && styles.valueHero]} numberOfLines={2}>
+              {value}
+            </Text>
+          ) : null}
           {subtitle ? (
             <Text style={styles.subtitle} numberOfLines={3}>
               {subtitle}
@@ -104,7 +108,7 @@ const styles = StyleSheet.create({
   },
   value: {
     fontSize: 22,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.extraLight,
     color: metricText.value,
     letterSpacing: 0.2,
     ...textContrast,

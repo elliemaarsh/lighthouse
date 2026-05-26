@@ -1,5 +1,25 @@
 import type { TodayLogSummary } from '@/types/checkIn';
 
+export const CYCLE_ACCENT = '#27359E';
+export const CYCLE_DOT_COUNT = 10;
+export const DEFAULT_CYCLE_LENGTH = 28;
+export const DEFAULT_CYCLE_DAY = 14;
+
+export function cyclePhaseForDay(day: number): string {
+  if (day <= 0) return '';
+  if (day <= 5) return 'Menstrual';
+  if (day <= 14) return 'Follicular';
+  return 'Luteal';
+}
+
+export function cycleFilledDotCount(day: number, cycleLength = DEFAULT_CYCLE_LENGTH): number {
+  if (day <= 0) return 0;
+  return Math.min(
+    CYCLE_DOT_COUNT,
+    Math.max(1, Math.round((day / cycleLength) * CYCLE_DOT_COUNT)),
+  );
+}
+
 export type CycleDayDisplay = {
   value: string;
   subtitle: string;

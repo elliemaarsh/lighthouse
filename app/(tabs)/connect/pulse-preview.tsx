@@ -14,7 +14,10 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { routes } from '@/constants/routes';
+import { PillButton } from '@/components/onboarding/PillButton';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fonts } from '@/constants/theme';
+import { lightCardShadow } from '@/constants/glass';
 import { pulseDraftSession } from '@/lib/pulseDraft';
 import {
   getTodayDateString,
@@ -125,23 +128,22 @@ export default function PulsePreviewScreen() {
           <SummaryRow label="Capacity" value={`${draft.capacityScore}/5`} />
           <SummaryRow label="I need" value={draft.currentNeed} />
 
-          <Pressable
-            style={[styles.primaryBtn, saving && styles.btnDisabled]}
-            onPress={() => void persist(true)}
-            disabled={saving}
-          >
-            <Text style={styles.primaryBtnText}>
-              {saving ? 'Sending…' : 'Send Check-in'}
-            </Text>
-          </Pressable>
+          <View style={styles.ctaGroup}>
+            <PillButton
+              label={saving ? 'Sending…' : 'Send Check-in'}
+              tier={2}
+              onPress={() => void persist(true)}
+              disabled={saving}
+            />
 
-          <Pressable
-            style={[styles.ghostBtn, saving && styles.btnDisabled]}
-            onPress={() => void persist(false)}
-            disabled={saving}
-          >
-            <Text style={styles.ghostBtnText}>Save for myself only</Text>
-          </Pressable>
+            <PillButton
+              label="Save for myself only"
+              tier={1}
+              onPress={() => void persist(false)}
+              disabled={saving}
+              style={styles.ctaSecondary}
+            />
+          </View>
         </ScrollView>
       </SafeAreaView>
     </View>
@@ -171,7 +173,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.backgroundTransparent,
   },
   topBar: {
-    paddingHorizontal: 8,
+    width: '100%',
+    paddingLeft: 32,
+    paddingRight: 32,
     paddingTop: 8,
   },
   backBtn: {
@@ -209,9 +213,9 @@ const styles = StyleSheet.create({
   previewCard: {
     borderRadius: 20,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
-    backgroundColor: colors.cardUnselectedBg,
+    borderWidth: 0,
+    backgroundColor: colors.white,
+    ...lightCardShadow,
   },
   previewInner: {
     padding: 24,
@@ -275,34 +279,14 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     textAlign: 'right',
   },
-  primaryBtn: {
+  ctaGroup: {
     marginTop: 32,
-    backgroundColor: colors.buttonPrimaryBg,
-    borderRadius: 100,
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
+    gap: 12,
+    alignSelf: 'stretch',
+    width: '100%',
   },
-  primaryBtnText: {
-    fontSize: 15,
-    fontFamily: fonts.medium,
-    color: colors.white,
-  },
-  ghostBtn: {
-    marginTop: 12,
-    borderRadius: 100,
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.buttonGhostBorder,
-  },
-  ghostBtnText: {
-    fontSize: 15,
-    fontFamily: fonts.medium,
-    color: colors.textSecondary,
-  },
-  btnDisabled: {
-    opacity: 0.65,
+  ctaSecondary: {
+    alignSelf: 'stretch',
+    width: '100%',
   },
 });

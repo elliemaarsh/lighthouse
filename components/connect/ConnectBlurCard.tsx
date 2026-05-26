@@ -1,9 +1,7 @@
-import { BlurView } from '@react-native-community/blur';
 import type { ReactNode } from 'react';
-import { Platform, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
-import { glass } from '@/constants/glass';
-import { connectDashboard } from '@/constants/theme';
+import { GlassSurface } from '@/components/GlassSurface';
 
 type ConnectBlurCardProps = {
   children: ReactNode;
@@ -18,35 +16,18 @@ export function ConnectBlurCard({
   children,
   style,
   borderRadius = 20,
-  blurAmount = 16,
   padding = 16,
   onPress,
 }: ConnectBlurCardProps) {
   const shell = (
-    <View
-      style={[
-        styles.shell,
-        { borderRadius, borderColor: glass.borderLight },
-        style,
-      ]}
+    <GlassSurface
+      variant="card"
+      borderRadius={borderRadius}
+      shadow="none"
+      style={style}
     >
-      {Platform.OS === 'web' ? (
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            { borderRadius, backgroundColor: glass.fallbackLight },
-          ]}
-        />
-      ) : (
-        <BlurView
-          style={[StyleSheet.absoluteFill, { borderRadius }]}
-          blurType="light"
-          blurAmount={blurAmount}
-          reducedTransparencyFallbackColor={glass.fallbackLight}
-        />
-      )}
       <View style={[styles.content, { padding }]}>{children}</View>
-    </View>
+    </GlassSurface>
   );
 
   if (onPress) {
@@ -56,10 +37,6 @@ export function ConnectBlurCard({
 }
 
 const styles = StyleSheet.create({
-  shell: {
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
   content: {
     zIndex: 2,
   },

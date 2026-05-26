@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: fontSizes.label,
     fontFamily: fonts.medium,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     letterSpacing: 1,
     textTransform: 'uppercase',
     marginTop: 8,

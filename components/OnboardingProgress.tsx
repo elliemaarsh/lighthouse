@@ -19,9 +19,11 @@ export function OnboardingProgress({ current, total = 10 }: OnboardingProgressPr
 
 const styles = StyleSheet.create({
   track: {
-    height: 3,
+    height: 4,
     borderRadius: 100,
-    backgroundColor: onboardingTheme.progressTrack,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: onboardingTheme.progressTrack,
     overflow: 'hidden',
   },
   fill: {

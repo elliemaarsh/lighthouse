@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { spacing } from '@/constants/theme';
 
 /** Floating glass tab bar (pill + vertical padding) */
-const FLOATING_TAB_BAR_HEIGHT = 80;
+const FLOATING_TAB_BAR_HEIGHT = 68;
 
 type Options = {
   /** Extra space for tall card grids (e.g. partner category rows) */

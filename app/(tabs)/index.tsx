@@ -1,193 +1,133 @@
-import { useFocusEffect } from '@react-navigation/native';
-import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { NonCarryingHomeContent } from '@/components/home/NonCarryingHomeContent';
-import { DataMetricCard } from '@/components/DataMetricCard';
-import { GlassSurface } from '@/components/GlassSurface';
-import { routes } from '@/constants/routes';
-import { colors, fontSizes, fonts, radius, spacing, textContrast, typography } from '@/constants/theme';
-import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
-import { todayCheckInSession } from '@/lib/todayCheckIn';
-import { useTabBarStore } from '@/store/useTabBarStore';
+import { LighthouseLogo } from '@/components/brand/LighthouseLogo';
+import { HomeHeaderActions } from '@/components/home/HomeHeaderActions';
+import { TabScrollView } from '@/components/TabScrollView';
+import { HomeWidgetGrid } from '@/components/widgets/HomeWidgetGrid';
+import { WidgetLibrary } from '@/components/widgets/WidgetLibrary';
+import { fonts, homeMist } from '@/constants/theme';
+import { defaultWidgetsForRole, useWidgetStore } from '@/store/useWidgetStore';
 import { useUserStore } from '@/store/useUserStore';
 
-export default function HomeScreen() {
-  const role = useUserStore((s) => s.role);
-
-  if (role === 'non-carrying') {
-    return <NonCarryingHomeContent />;
-  }
-
-  return <CarryingHomeContent />;
+function greetingForHour(hour: number) {
+  if (hour < 12) return 'Good morning,';
+  if (hour < 17) return 'Good afternoon,';
+  return 'Good evening,';
 }
 
-function CarryingHomeContent() {
-  const scrollPadding = useTabBarScrollPadding();
-  const setTabBarHidden = useTabBarStore((s) => s.setHidden);
-  const displayName = useUserStore((s) => s.displayName);
-  const userId = useUserStore((s) => s.userId);
-  const [hasLoggedToday, setHasLoggedToday] = useState(
-    todayCheckInSession.getHasLoggedToday(),
-  );
-  const [todayLog, setTodayLog] = useState(todayCheckInSession.getTodayLog());
+function formatDateLabel(date: Date) {
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
-  useFocusEffect(
-    useCallback(() => {
-      setTabBarHidden(false);
-      void todayCheckInSession.hydrate(userId).then(() => {
-        setHasLoggedToday(todayCheckInSession.getHasLoggedToday());
-        setTodayLog(todayCheckInSession.getTodayLog());
-      });
-    }, [userId, setTabBarHidden]),
-  );
+export default function HomeScreen() {
+  const libraryRef = useRef<BottomSheetModal>(null);
+  const [widgetsHydrated, setWidgetsHydrated] = useState(false);
 
-  const nameLabel = displayName?.trim() ? displayName.trim() : 'Your';
+  const role = useUserStore((s) => s.role);
+  const name = useUserStore((s) => s.name || s.displayName || 'there');
+  const activeWidgets = useWidgetStore((s) => s.activeWidgets);
+  const setActiveWidgets = useWidgetStore((s) => s.setActiveWidgets);
 
-  const moodValue =
-    todayLog?.mood != null
-      ? `${['', 'Low', 'Meh', 'Okay', 'Good', 'Great'][todayLog.mood]} · ${todayLog.mood}/5`
-      : hasLoggedToday
-        ? '—'
-        : 'Not logged';
+  const greeting = useMemo(() => greetingForHour(new Date().getHours()), []);
+  const dateLabel = useMemo(() => formatDateLabel(new Date()), []);
+
+  useEffect(() => {
+    const unsubFinish = useWidgetStore.persist.onFinishHydration(() => {
+      setWidgetsHydrated(true);
+    });
+    if (useWidgetStore.persist.hasHydrated()) {
+      setWidgetsHydrated(true);
+    }
+    return unsubFinish;
+  }, []);
+
+  useEffect(() => {
+    if (!widgetsHydrated) return;
+    if (activeWidgets.length === 0) {
+      setActiveWidgets(defaultWidgetsForRole(role));
+    }
+  }, [widgetsHydrated, activeWidgets.length, role, setActiveWidgets]);
+
+  const openLibrary = useCallback(() => {
+    libraryRef.current?.present();
+  }, []);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[styles.scroll, { paddingBottom: scrollPadding }]}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.header}>
-          <View style={styles.headerText}>
-            <Text style={styles.greeting}>Good morning</Text>
-            <Text style={styles.dashboardTitle}>{nameLabel}'s Dashboard</Text>
-          </View>
-          <Pressable
-            onPress={() => router.push(routes.settings)}
-            accessibilityRole="button"
-            accessibilityLabel="Open settings"
+    <GestureHandlerRootView style={styles.root}>
+      <BottomSheetModalProvider>
+        <SafeAreaView style={styles.safe} edges={['top']}>
+          <TabScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
           >
-            <GlassSurface variant="pill" borderRadius={radius.pill} shadow="soft">
-              <View style={styles.avatar} />
-            </GlassSurface>
-          </Pressable>
-        </View>
+            <View style={styles.header}>
+              <LighthouseLogo iconSize={52} />
+              <HomeHeaderActions onPlusPress={openLibrary} />
+            </View>
 
-        <View style={styles.grid}>
-          <DataMetricCard
-            size="hero"
-            label="Today"
-            value={hasLoggedToday ? 'Logged' : 'No log yet'}
-            subtitle={moodValue}
-            art="orbits"
-            style={styles.hero}
-            footer={
-              !hasLoggedToday ? (
-                <Pressable
-                  onPress={() => router.push(routes.checkinStep1)}
-                  style={styles.cardLinkWrap}
-                >
-                  <Text style={styles.cardLink}>Log your day →</Text>
-                </Pressable>
-              ) : null
-            }
-          />
-          <View style={styles.row}>
-            <DataMetricCard
-              label="Cycle day"
-              value="—"
-              subtitle="Start tracking"
-              art="arcs"
-              style={styles.cell}
-            />
-            <DataMetricCard
-              label="This week"
-              value="Check in"
-              subtitle="See how you're doing together"
-              art="timeline"
-              style={styles.cell}
-              footer={
-                <Pressable
-                  onPress={() => router.push(routes.connect)}
-                  style={styles.cardLinkWrap}
-                >
-                  <Text style={styles.cardLink}>Connect →</Text>
-                </Pressable>
-              }
-            />
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            <View style={styles.greetingBlock}>
+              <Text style={styles.greeting}>{greeting}</Text>
+              <Text style={styles.greeting}>{name}</Text>
+              <Text style={styles.date}>{dateLabel}</Text>
+            </View>
+
+            <HomeWidgetGrid />
+          </TabScrollView>
+        </SafeAreaView>
+
+        <WidgetLibrary ref={libraryRef} />
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
   safe: {
     flex: 1,
-    backgroundColor: colors.backgroundTransparent,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: colors.backgroundTransparent,
+    backgroundColor: 'transparent',
   },
   scroll: {
-    paddingTop: 60,
-    paddingHorizontal: spacing.lg,
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 120,
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: spacing.lg,
+    alignItems: 'center',
+    paddingTop: 56,
+    paddingHorizontal: 24,
   },
-  headerText: {
-    flex: 1,
-    paddingRight: spacing.md,
+  greetingBlock: {
+    paddingHorizontal: 24,
+    paddingTop: 16,
+    paddingBottom: 32,
+    marginTop: 40,
+    marginBottom: 16,
   },
   greeting: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textMuted,
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    ...textContrast,
+    fontSize: 40,
+    fontFamily: fonts.extraLight,
+    color: homeMist.textPrimary,
+    lineHeight: 48,
   },
-  dashboardTitle: {
-    fontSize: 28,
-    fontFamily: typography.headline.fontFamily,
-    letterSpacing: typography.headline.letterSpacing,
-    color: colors.textPrimary,
-    marginTop: 6,
-    ...textContrast,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-  },
-  grid: {
-    gap: 14,
-  },
-  hero: {
-    width: '100%',
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 14,
-  },
-  cell: {
-    flex: 1,
-  },
-  cardLinkWrap: {
-    marginTop: 12,
-  },
-  cardLink: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textPrimary,
-    ...textContrast,
+  date: {
+    fontSize: 14,
+    fontFamily: fonts.regular,
+    color: homeMist.textMuted,
+    marginTop: 4,
   },
 });

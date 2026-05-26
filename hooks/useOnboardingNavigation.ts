@@ -57,7 +57,7 @@ export function useOnboardingNavigation() {
     }
 
     if (!hasCompletedOnboarding && inTabs) {
-      router.replace('/onboarding/splash');
+      router.replace('/onboarding/welcome');
     }
   }, [hasCompletedOnboarding, navigationState?.key, router, segments, storeReady]);
 }

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Calendar, type DateData } from 'react-native-calendars';
 
 import { ConnectBlurCard } from '@/components/connect/ConnectBlurCard';
-import { connectDashboard, fonts } from '@/constants/theme';
+import { colors, connectDashboard, fonts } from '@/constants/theme';
 import type { Appointment } from '@/types/connect';
 
 type ConnectCalendarSectionProps = {
@@ -71,9 +71,9 @@ export function ConnectCalendarSection({
             backgroundColor: 'transparent',
             calendarBackground: 'transparent',
             textSectionTitleColor: connectDashboard.textMuted,
-            selectedDayBackgroundColor: connectDashboard.calendarSelectedBg,
+            selectedDayBackgroundColor: colors.accentOrange,
             selectedDayTextColor: connectDashboard.calendarSelectedText,
-            todayTextColor: connectDashboard.textPrimary,
+            todayTextColor: connectDashboard.todayTextColor,
             dayTextColor: connectDashboard.textPrimary,
             textDisabledColor: connectDashboard.textMuted,
             dotColor: connectDashboard.textPrimary,

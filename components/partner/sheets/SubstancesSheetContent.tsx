@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: fontSizes.label,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     marginBottom: 16,
     lineHeight: 18,
     ...textContrast,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   stepperLabel: {
     fontSize: fontSizes.label,
     fontFamily: fonts.medium,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     marginBottom: 12,
     ...textContrast,
   },
@@ -124,13 +124,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 24,
     fontFamily: fonts.regular,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     ...textContrast,
   },
   stepValue: {
     fontSize: 28,
     fontFamily: typography.display.fontFamily,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     minWidth: 32,
     textAlign: 'center',
     ...textContrast,

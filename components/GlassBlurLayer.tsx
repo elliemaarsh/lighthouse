@@ -1,23 +1,15 @@
 import { BlurView as CommunityBlurView } from '@react-native-community/blur';
-import Constants from 'expo-constants';
 import { BlurView as ExpoBlurView } from 'expo-blur';
 import { Platform, StyleSheet, View } from 'react-native';
 
-import { glass } from '@/constants/glass';
 import type { GlassVariant } from '@/components/GlassSurface';
+import { glass } from '@/constants/glass';
+import { blurIntensityFromAmount, expoBlurTint, shouldUseExpoBlur } from '@/lib/blur';
 
 type GlassBlurLayerProps = {
   variant: GlassVariant;
   borderRadius: number;
 };
-
-/** Expo Go does not ship @react-native-community/blur — use expo-blur there instead. */
-function useExpoBlur() {
-  return (
-    Constants.executionEnvironment === 'storeClient' ||
-    Constants.appOwnership === 'expo'
-  );
-}
 
 export function GlassBlurLayer({ variant, borderRadius }: GlassBlurLayerProps) {
   const isDark = variant === 'dark' || variant === 'data';
@@ -59,12 +51,12 @@ export function GlassBlurLayer({ variant, borderRadius }: GlassBlurLayerProps) {
     );
   }
 
-  if (useExpoBlur()) {
+  if (shouldUseExpoBlur()) {
     return (
       <>
         <ExpoBlurView
-          intensity={isDark ? 72 : 55}
-          tint={isDark ? 'dark' : 'light'}
+          intensity={blurIntensityFromAmount(isDark ? glass.blurAmountDark : glass.blurAmountLight)}
+          tint={expoBlurTint(isDark ? 'dark' : 'light')}
           style={[StyleSheet.absoluteFill, { borderRadius, overflow: 'hidden' }]}
         />
         <View

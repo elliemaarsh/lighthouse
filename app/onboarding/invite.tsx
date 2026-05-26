@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { OnboardingGlassPillButton } from '@/app/onboarding/components/OnboardingGlassPillButton';
-import { OnboardingPillButton } from '@/app/onboarding/components/OnboardingPillButton';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
 import { saveUserProfileToSupabase } from '@/app/onboarding/lib/saveUserProfile';
 import { onboardingTheme } from '@/app/onboarding/theme';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { fontSizes, fonts } from '@/constants/theme';
 import { partnerFirstName } from '@/lib/partnerDisplay';
 import { useUserStore } from '@/store/useUserStore';
@@ -57,6 +57,9 @@ export default function InviteScreen() {
       subtext="Connect your accounts to share updates, appointments, and support each other."
       showBack
       onBack={() => router.back()}
+      showSkip
+      skipLabel="Skip for now"
+      onSkip={() => void handleSkip()}
       scrollable
     >
       <View style={styles.inputWrap}>
@@ -80,15 +83,6 @@ export default function InviteScreen() {
           tone="dark"
         />
       </View>
-
-      <View style={styles.skipWrap}>
-        <OnboardingPillButton
-          label="Skip for now"
-          variant="ghost"
-          onPress={() => void handleSkip()}
-          disabled={saving}
-        />
-      </View>
     </OnboardingShell>
   );
 }
@@ -98,23 +92,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   input: {
-    backgroundColor: onboardingTheme.inputBg,
+    ...inputFieldStyle,
     borderRadius: 100,
     paddingVertical: 16,
     paddingHorizontal: 22,
     fontSize: fontSizes.body,
     fontFamily: fonts.regular,
     color: onboardingTheme.textPrimary,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
   sendWrap: {
     marginTop: 28,
     paddingTop: 8,
-    alignItems: 'flex-end',
-  },
-  skipWrap: {
-    marginTop: 20,
     alignItems: 'flex-end',
   },
 });

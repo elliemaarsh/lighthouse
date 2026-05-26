@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { DialRulerPicker } from '@/components/ui/DialRulerPicker';
 import { PULSE_SCORE_VALUES } from '@/constants/pulseCheck';
-import { colors, fonts } from '@/constants/theme';
+import { connectDashboard, fonts } from '@/constants/theme';
 
 type PulseScoreDialProps = {
   value: number | null;
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   edgeLabel: {
     fontSize: 11,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: connectDashboard.textMuted,
     maxWidth: '42%',
   },
   edgeLabelRight: {

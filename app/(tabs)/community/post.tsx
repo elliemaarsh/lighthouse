@@ -16,6 +16,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { COMMUNITY_SURFACE } from '@/constants/community';
+import { lightCardShadow } from '@/constants/glass';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fonts, spacing } from '@/constants/theme';
 import {
   createCommunityReply,
@@ -271,11 +273,12 @@ const styles = StyleSheet.create({
   postShell: {
     borderRadius: 20,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderWidth: 0,
+    backgroundColor: colors.white,
+    ...lightCardShadow,
   },
   postFallback: {
-    backgroundColor: 'rgba(255,255,255,0.55)',
+    backgroundColor: colors.white,
   },
   postInner: {
     padding: 20,
@@ -363,11 +366,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: 'hidden',
     marginBottom: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
+    borderWidth: 0,
+    backgroundColor: colors.white,
+    ...lightCardShadow,
   },
   replyFallback: {
-    backgroundColor: 'rgba(255,255,255,0.45)',
+    backgroundColor: colors.white,
   },
   replyInner: {
     padding: 16,
@@ -416,8 +420,8 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   composerInput: {
+    ...inputFieldStyle,
     flex: 1,
-    backgroundColor: COMMUNITY_SURFACE,
     borderRadius: 20,
     paddingHorizontal: 12,
     paddingVertical: 12,
@@ -430,7 +434,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.textPrimary,
+    backgroundColor: '#27359E',
     alignItems: 'center',
     justifyContent: 'center',
   },

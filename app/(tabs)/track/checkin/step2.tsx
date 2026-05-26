@@ -2,18 +2,21 @@ import { router } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useCheckInEditMode } from '@/hooks/useCheckInEditMode';
 import { CheckInAlternateOption } from '@/components/checkin/CheckInAlternateOption';
 import { TemperatureRulerPicker } from '@/components/checkin/TemperatureRulerPicker';
 import { CheckInStepLayout } from '@/components/checkin/CheckInStepLayout';
-import { GlassSurface } from '@/components/GlassSurface';
+import {
+  BUTTON_OPTION_SELECTED,
+  BUTTON_OPTION_UNSELECTED,
+} from '@/constants/buttons';
 import { noFocusRing } from '@/lib/focusRing';
-import { useCheckIn } from '@/contexts/CheckInContext';
+import { useCheckInStore } from '@/store/useCheckInStore';
 import { routes } from '@/constants/routes';
 import { colors, fontSizes, fonts, textContrast } from '@/constants/theme';
 import type { TempUnit } from '@/types/checkIn';
 
 const DIDNT_MEASURE_LABEL = "Didn't measure";
-
 function defaultForUnit(unit: TempUnit): number {
   return unit === 'F' ? 98.6 : 36.8;
 }
@@ -27,13 +30,15 @@ function cToF(c: number): number {
 }
 
 export default function CheckInStep2() {
-  const { data, update } = useCheckIn();
+  const isEdit = useCheckInEditMode();
+  const draft = useCheckInStore();
+  const setFields = useCheckInStore((s) => s.setFields);
   const [temperature, setTemperature] = useState<number | null>(
-    data.temperature ??
-      (data.temperatureNotMeasured ? null : defaultForUnit(data.tempUnit)),
+    draft.temperature ??
+      (draft.temperatureNotMeasured ? null : defaultForUnit(draft.tempUnit)),
   );
-  const [unit, setUnit] = useState<TempUnit>(data.tempUnit);
-  const [didntMeasure, setDidntMeasure] = useState(data.temperatureNotMeasured);
+  const [unit, setUnit] = useState<TempUnit>(draft.tempUnit);
+  const [didntMeasure, setDidntMeasure] = useState(draft.temperatureNotMeasured);
 
   const hasValue = !didntMeasure;
   const pickerValue = didntMeasure ? null : (temperature ?? defaultForUnit(unit));
@@ -43,7 +48,7 @@ export default function CheckInStep2() {
     temperatureNotMeasured: boolean;
     tempUnit: TempUnit;
   }) => {
-    update(payload);
+    setFields(payload);
     router.push(routes.checkinStep3);
   };
 
@@ -58,7 +63,7 @@ export default function CheckInStep2() {
   const handleDidntMeasure = () => {
     setDidntMeasure(true);
     setTemperature(null);
-    update({ temperature: null, temperatureNotMeasured: true });
+    setFields({ temperature: null, temperatureNotMeasured: true });
   };
 
   const handleSkip = () => {
@@ -72,7 +77,7 @@ export default function CheckInStep2() {
   const handleTempChange = (next: number) => {
     setTemperature(next);
     setDidntMeasure(false);
-    update({ temperature: next, temperatureNotMeasured: false });
+    setFields({ temperature: next, temperatureNotMeasured: false });
   };
 
   const setTempUnit = (next: TempUnit) => {
@@ -81,9 +86,9 @@ export default function CheckInStep2() {
     if (temperature !== null) {
       const converted = next === 'C' ? fToC(temperature) : cToF(temperature);
       setTemperature(converted);
-      update({ tempUnit: next, temperature: converted });
+      setFields({ tempUnit: next, temperature: converted });
     } else {
-      update({ tempUnit: next });
+      setFields({ tempUnit: next });
     }
   };
 
@@ -91,6 +96,7 @@ export default function CheckInStep2() {
     <CheckInStepLayout
       step={2}
       totalSteps={4}
+      editMode={isEdit}
       question="What was your basal temperature?"
       subtext="Measure first thing in the morning, before getting up"
       canContinue={hasValue || didntMeasure}
@@ -111,29 +117,29 @@ export default function CheckInStep2() {
               key={u}
               onPress={() => setTempUnit(u)}
               disabled={didntMeasure}
-              style={[
-                styles.unitPillWrap,
+              style={({ pressed }) => [
+                styles.unitPillPressable,
+                pressed && !didntMeasure && styles.unitPillPressed,
                 noFocusRing,
                 didntMeasure && styles.unitPillMuted,
               ]}
             >
-              <GlassSurface
-                variant={unit === u ? 'selected' : 'pill'}
-                borderRadius={100}
-                shadow="none"
+              <View
+                style={[
+                  styles.unitPill,
+                  unit === u && styles.unitPillSelected,
+                ]}
               >
-                <View style={styles.unitPillInner}>
-                  <Text
-                    style={[
-                      styles.unitText,
-                      unit === u && styles.unitTextSelected,
-                      didntMeasure && styles.unitTextMuted,
-                    ]}
-                  >
-                    °{u}
-                  </Text>
-                </View>
-              </GlassSurface>
+                <Text
+                  style={[
+                    styles.unitText,
+                    unit === u && styles.unitTextSelected,
+                    didntMeasure && styles.unitTextMuted,
+                  ]}
+                >
+                  °{u}
+                </Text>
+              </View>
             </Pressable>
           ))}
         </View>
@@ -155,26 +161,35 @@ const styles = StyleSheet.create({
     gap: 8,
     marginTop: 20,
   },
-  unitPillWrap: {
+  unitPillPressable: {
     borderRadius: 100,
-    overflow: 'hidden',
   },
-  unitPillInner: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  unitPill: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 52,
+    ...BUTTON_OPTION_UNSELECTED.container,
+  },
+  unitPillSelected: {
+    ...BUTTON_OPTION_SELECTED.container,
+  },
+  unitPillPressed: {
+    opacity: 0.88,
   },
   unitPillMuted: {
     opacity: 0.5,
   },
   unitText: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textMuted,
+    fontSize: 14,
+    letterSpacing: 0.3,
+    ...BUTTON_OPTION_UNSELECTED.label,
     ...textContrast,
   },
   unitTextSelected: {
-    fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
+    ...BUTTON_OPTION_SELECTED.label,
   },
   unitTextMuted: {
     color: colors.textMuted,

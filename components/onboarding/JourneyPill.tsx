@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { noFocusRing } from '@/lib/focusRing';
+import { BUTTON_OPTION_SELECTED } from '@/constants/buttons';
 import { colors, fontSizes, fonts, radius } from '@/constants/theme';
 
 type JourneyPillProps = {
@@ -58,6 +59,6 @@ const styles = StyleSheet.create({
     letterSpacing: 0.15,
   },
   labelSelected: {
-    fontFamily: fonts.semiBold,
+    ...BUTTON_OPTION_SELECTED.label,
   },
 });

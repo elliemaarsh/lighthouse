@@ -2,7 +2,6 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { useCallback } from 'react';
 
-import { CheckInProvider } from '@/contexts/CheckInContext';
 import { colors } from '@/constants/theme';
 import { useTabBarStore } from '@/store/useTabBarStore';
 
@@ -17,20 +16,18 @@ export default function CheckInLayout() {
   );
 
   return (
-    <CheckInProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-          contentStyle: { backgroundColor: colors.backgroundTransparent },
-        }}
-      >
-        <Stack.Screen name="step1" />
-        <Stack.Screen name="step2" />
-        <Stack.Screen name="step3" />
-        <Stack.Screen name="step5" />
-        <Stack.Screen name="complete" />
-      </Stack>
-    </CheckInProvider>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+        contentStyle: { backgroundColor: colors.backgroundTransparent },
+      }}
+    >
+      <Stack.Screen name="step1" />
+      <Stack.Screen name="step2" />
+      <Stack.Screen name="step3" />
+      <Stack.Screen name="step5" />
+      <Stack.Screen name="complete" />
+    </Stack>
   );
 }

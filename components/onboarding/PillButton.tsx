@@ -1,99 +1,38 @@
 import { forwardRef, type ComponentRef } from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import type { ViewStyle } from 'react-native';
 
-import { GlassSurface } from '@/components/GlassSurface';
-import { noFocusRing } from '@/lib/focusRing';
-import { colors, fontSizes, fonts, radius, textContrast } from '@/constants/theme';
+import { AppButton, type AppButtonTier } from '@/components/ui/AppButton';
 
 type PillButtonProps = {
   label: string;
   onPress?: () => void;
-  variant?: 'primary' | 'ghost' | 'glass';
+  /** @deprecated Use `tier` — primary = 2, outline/ghost/glass = 1 */
+  variant?: 'primary' | 'ghost' | 'glass' | 'outline';
+  tier?: AppButtonTier;
   disabled?: boolean;
   style?: ViewStyle;
 };
 
-export const PillButton = forwardRef<ComponentRef<typeof Pressable>, PillButtonProps>(
+function tierFromVariant(variant: PillButtonProps['variant']): AppButtonTier {
+  return variant === 'primary' ? 2 : 1;
+}
+
+export const PillButton = forwardRef<ComponentRef<typeof AppButton>, PillButtonProps>(
   function PillButton(
-    { label, onPress, variant = 'primary', disabled = false, style },
+    { label, onPress, variant = 'primary', tier, disabled = false, style },
     ref,
   ) {
-    const isGlass = variant === 'glass' || variant === 'primary';
-    const isGhost = variant === 'ghost';
+    const resolvedTier = tier ?? tierFromVariant(variant);
 
     return (
-      <Pressable
+      <AppButton
         ref={ref}
+        label={label}
         onPress={onPress}
+        tier={resolvedTier}
         disabled={disabled}
-        style={({ pressed }) => [
-          styles.pressable,
-          noFocusRing,
-          disabled && styles.disabled,
-          pressed && !disabled && styles.pressed,
-          style,
-        ]}
-        accessibilityRole="button"
-        accessibilityState={{ disabled }}
-      >
-        <GlassSurface
-          variant={isGhost ? 'pill' : disabled ? 'card' : 'selected'}
-          borderRadius={radius.pill}
-          shadow={disabled ? 'soft' : 'card'}
-          style={styles.glass}
-        >
-          <View style={styles.inner}>
-            <Text
-              style={[
-                styles.label,
-                isGhost ? styles.labelGhost : styles.labelPrimary,
-                !disabled && !isGhost && styles.labelEmphasis,
-              ]}
-            >
-              {label}
-            </Text>
-          </View>
-        </GlassSurface>
-      </Pressable>
+        style={style}
+      />
     );
   },
 );
-
-const styles = StyleSheet.create({
-  pressable: {
-    width: '100%',
-    borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  glass: {
-    width: '100%',
-  },
-  inner: {
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 28,
-  },
-  disabled: {
-    opacity: 0.55,
-  },
-  pressed: {
-    opacity: 0.92,
-  },
-  label: {
-    fontSize: 15,
-    fontFamily: fonts.medium,
-    letterSpacing: 0.4,
-  },
-  labelPrimary: {
-    color: colors.textPrimary,
-    ...textContrast,
-  },
-  labelEmphasis: {
-    fontFamily: fonts.semiBold,
-  },
-  labelGhost: {
-    color: colors.textSecondary,
-    ...textContrast,
-  },
-});

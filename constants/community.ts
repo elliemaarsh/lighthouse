@@ -1,7 +1,6 @@
-import { appBackground } from '@/constants/gradient';
+import { colors } from '@/constants/theme';
 
-/** Community screens — same flat light blue as the rest of the app */
-export const COMMUNITY_SURFACE = appBackground;
+export const COMMUNITY_SURFACE = colors.backgroundTransparent;
 
 /** @deprecated Use COMMUNITY_SURFACE */
 export const COMMUNITY_SETUP_BG = COMMUNITY_SURFACE;

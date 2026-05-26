@@ -1,44 +1,61 @@
 import { useFocusEffect } from '@react-navigation/native';
 import { router } from 'expo-router';
-import { useCallback, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
 
 import { MedicalExportCard } from '@/components/track/MedicalExportCard';
-import { CheckInSummaryGrid } from '@/components/CheckInSummaryGrid';
-import { DataMetricCard } from '@/components/DataMetricCard';
-import { GlassCard } from '@/components/GlassCard';
-import { PillButton } from '@/components/onboarding/PillButton';
-import { routes } from '@/constants/routes';
+import { TrackTodayDetailSection } from '@/components/track/TrackTodayDetailSection';
+import { TrackWeekStripSection } from '@/components/track/TrackWeekStripSection';
 import PartnerTrackScreen from './partner';
-import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
-import { todayCheckInSession } from '@/lib/todayCheckIn';
-import type { TodayLogSummary } from '@/types/checkIn';
+import { colors, spacing } from '@/constants/theme';
+import {
+  fetchDailyLogsInRange,
+  type DailyLogEntry,
+} from '@/lib/logsInRange';
+import {
+  buildWeekDayCells,
+  getWeekEndString,
+} from '@/lib/trackWeekView';
+import { getWeekStartString } from '@/lib/weekStart';
 import { useTabBarStore } from '@/store/useTabBarStore';
+import { useCheckInStore } from '@/store/useCheckInStore';
+import { useTrackStore } from '@/store/useTrackStore';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function TrackScreen() {
   const role = useUserStore((s) => s.role);
   const userId = useUserStore((s) => s.userId);
+  const hasLoggedToday = useTrackStore((s) => s.hasLoggedToday);
+  const todayLog = useTrackStore((s) => s.todayLog);
+  const hydrateFromRemote = useTrackStore((s) => s.hydrateFromRemote);
+  const resetIfNewDay = useTrackStore((s) => s.resetIfNewDay);
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
   const scrollBottomPad = useTabBarScrollPadding();
-  const [hasLoggedToday, setHasLoggedToday] = useState(
-    todayCheckInSession.getHasLoggedToday(),
-  );
-  const [todayLog, setTodayLog] = useState<TodayLogSummary | null>(
-    todayCheckInSession.getTodayLog(),
+  const [weekLogs, setWeekLogs] = useState<DailyLogEntry[]>([]);
+
+  const weekDays = useMemo(
+    () => buildWeekDayCells(weekLogs, todayLog, hasLoggedToday),
+    [weekLogs, todayLog, hasLoggedToday],
   );
 
   useFocusEffect(
     useCallback(() => {
-      void todayCheckInSession.hydrate(userId).then(() => {
-        setHasLoggedToday(todayCheckInSession.getHasLoggedToday());
-        setTodayLog(todayCheckInSession.getTodayLog());
-      });
+      resetIfNewDay();
+      const weekStart = getWeekStartString();
+      const weekEnd = getWeekEndString(weekStart);
+
+      const load = async () => {
+        await hydrateFromRemote(userId);
+        const logs = await fetchDailyLogsInRange(userId, weekStart, weekEnd);
+        setWeekLogs(logs);
+      };
+
+      void load();
       setTabBarHidden(false);
-    }, [role, setTabBarHidden, userId]),
+    }, [hydrateFromRemote, resetIfNewDay, setTabBarHidden, userId]),
   );
 
   if (role === 'non-carrying') {
@@ -46,8 +63,20 @@ export default function TrackScreen() {
   }
 
   const beginCheckIn = () => {
+    useCheckInStore.getState().reset();
     setTabBarHidden(true);
-    router.push(routes.checkinStep1);
+    router.push({
+      pathname: '/(tabs)/track/checkin/step1',
+      params: { mode: 'new' },
+    });
+  };
+
+  const editCheckIn = () => {
+    setTabBarHidden(true);
+    router.push({
+      pathname: '/(tabs)/track/checkin/step1',
+      params: { mode: 'edit' },
+    });
   };
 
   return (
@@ -59,55 +88,22 @@ export default function TrackScreen() {
         keyboardShouldPersistTaps="handled"
         bounces
       >
-        {!hasLoggedToday ? (
-          <>
-            <Text style={styles.greeting}>Good morning</Text>
-            <Text style={styles.title}>How are you today?</Text>
+        <TrackWeekStripSection
+          days={weekDays}
+          hasLoggedToday={hasLoggedToday}
+          onBeginCheckIn={beginCheckIn}
+        />
 
-            <GlassCard borderRadius={24} padding={28} art="orbits" style={styles.cardSpacing}>
-              <Text style={styles.cardTitle}>Your daily check-in</Text>
-              <Text style={styles.cardSub}>Takes about 2 minutes</Text>
-              <PillButton
-                label="Begin →"
-                onPress={beginCheckIn}
-                variant="glass"
-                style={styles.beginBtn}
-              />
-            </GlassCard>
+        <TrackTodayDetailSection
+          hasLoggedToday={hasLoggedToday}
+          todayLog={todayLog}
+          onLogToday={beginCheckIn}
+          onEdit={editCheckIn}
+        />
 
-            <View style={styles.dataSection}>
-              <DataMetricCard
-                size="hero"
-                label="Last 7 days"
-                value="No logs yet"
-                subtitle="Complete your first check-in to see patterns"
-                art="orbits"
-              />
-              <DataMetricCard
-                label="Cycle day"
-                value="—"
-                subtitle="Log your period to start tracking"
-                art="arcs"
-                style={styles.fullWidth}
-              />
-            </View>
-
-            <MedicalExportCard />
-          </>
-        ) : (
-          <>
-            <Text style={styles.greeting}>Good morning</Text>
-            <Text style={styles.title}>Today's check-in</Text>
-
-            {todayLog ? <CheckInSummaryGrid log={todayLog} /> : null}
-
-            <Pressable onPress={beginCheckIn} style={styles.editWrap}>
-              <Text style={styles.editLink}>Edit today's log</Text>
-            </Pressable>
-
-            <MedicalExportCard />
-          </>
-        )}
+        <View style={styles.exportWrap}>
+          <MedicalExportCard />
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -126,58 +122,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: spacing.lg,
   },
-  greeting: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textMuted,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-    ...textContrast,
-  },
-  title: {
-    fontSize: 28,
-    fontFamily: typography.headline.fontFamily,
-    letterSpacing: typography.headline.letterSpacing,
-    color: colors.textPrimary,
-    marginTop: 6,
-    marginBottom: spacing.lg,
-    ...textContrast,
-  },
-  cardSpacing: {
-    marginBottom: spacing.md,
-  },
-  dataSection: {
-    gap: 12,
-  },
-  fullWidth: {
-    width: '100%',
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
-    ...textContrast,
-  },
-  cardSub: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
-    marginTop: 6,
-    marginBottom: 20,
-    ...textContrast,
-  },
-  beginBtn: {
-    marginTop: 4,
-  },
-  editWrap: {
+  exportWrap: {
     marginTop: spacing.md,
-    paddingVertical: 12,
-  },
-  editLink: {
-    fontSize: fontSizes.body,
-    fontFamily: fonts.medium,
-    color: colors.textPrimary,
-    textAlign: 'center',
-    ...textContrast,
   },
 });

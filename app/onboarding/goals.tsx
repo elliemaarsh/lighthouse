@@ -3,8 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GOAL_OPTIONS } from '@/app/onboarding/constants';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
-import { onboardingTheme } from '@/app/onboarding/theme';
-import { fontSizes, fonts } from '@/constants/theme';
+import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function GoalsScreen() {
@@ -46,25 +45,22 @@ const styles = StyleSheet.create({
     marginHorizontal: -4,
   },
   pill: {
-    backgroundColor: onboardingTheme.pillBg,
+    ...BUTTON_OPTION_UNSELECTED.container,
     borderRadius: 100,
     paddingVertical: 12,
     paddingHorizontal: 18,
     margin: 4,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
   pillOn: {
-    backgroundColor: onboardingTheme.pillSelectedBg,
-    borderColor: onboardingTheme.pillSelectedBg,
+    ...BUTTON_OPTION_SELECTED.container,
+    borderRadius: 100,
   },
   pillText: {
+    ...BUTTON_OPTION_UNSELECTED.label,
     fontSize: 14,
-    fontFamily: fonts.regular,
-    color: onboardingTheme.textPrimary,
   },
   pillTextOn: {
-    color: onboardingTheme.pillSelectedText,
-    fontFamily: fonts.medium,
+    ...BUTTON_OPTION_SELECTED.label,
+    fontSize: 14,
   },
 });

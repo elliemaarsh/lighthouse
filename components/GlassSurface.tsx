@@ -1,5 +1,5 @@
-import { BlurView } from '@react-native-community/blur';
 import type { ReactNode } from 'react';
+import { AppBlurView } from '@/components/AppBlurView';
 import { useEffect } from 'react';
 import { Platform, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, {
@@ -9,13 +9,27 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import {
+  connectCardGlass,
   GLASS_SELECT_DURATION,
   glass,
   glassShadow,
   glassShadowSoft,
+  lightCardShadow,
 } from '@/constants/glass';
+import { SURFACE } from '@/constants/surfaces';
 
-export type GlassVariant = 'card' | 'pill' | 'input' | 'dark' | 'data' | 'selected';
+export type GlassVariant =
+  | 'card'
+  | 'pill'
+  | 'input'
+  | 'dark'
+  | 'data'
+  | 'selected'
+  | 'light';
+
+function isContentCardVariant(variant: GlassVariant): boolean {
+  return variant === 'card' || variant === 'light' || variant === 'data';
+}
 
 type GlassSurfaceProps = {
   children: ReactNode;
@@ -25,23 +39,47 @@ type GlassSurfaceProps = {
   shadow?: 'none' | 'soft' | 'card';
 };
 
+function isLightVariant(variant: GlassVariant): boolean {
+  return variant === 'light';
+}
+
 function baseFrostForVariant(variant: GlassVariant): string {
+  if (isLightVariant(variant)) {
+    return glass.frostLight;
+  }
   if (variant === 'pill' || variant === 'data') {
     return glass.frostBare;
   }
   if (variant === 'input') {
-    return glass.frostInput;
+    return SURFACE.inputBackground;
   }
-  /* card + selected share base; selection fog cross-fades on top */
+  if (variant === 'selected') {
+    return glass.frostSelected;
+  }
   return glass.frostCard;
 }
 
 function blurConfig(variant: GlassVariant) {
+  if (variant === 'card') {
+    return {
+      blurType: connectCardGlass.blurType,
+      blurAmount: connectCardGlass.blurAmount,
+      reducedTransparencyFallbackColor: connectCardGlass.fallback,
+      baseFrost: connectCardGlass.frost,
+      borderColor: connectCardGlass.border,
+      borderStrong: connectCardGlass.borderStrong,
+      isSelected: false,
+    };
+  }
+
+  const light = isLightVariant(variant);
   return {
-    blurType: glass.blurTypeLight,
-    blurAmount: glass.blurAmountLight,
-    reducedTransparencyFallbackColor: glass.fallbackLight,
+    blurType: light ? glass.blurTypeLight : glass.blurTypeDark,
+    blurAmount: light ? glass.blurAmountLight : glass.blurAmountDark,
+    reducedTransparencyFallbackColor: light ? glass.fallbackLight : glass.fallbackDark,
     baseFrost: baseFrostForVariant(variant),
+    borderColor: light ? glass.borderLight : glass.borderDark,
+    borderStrong: light ? glass.borderLightStrong : glass.borderDarkStrong,
     isSelected: variant === 'selected',
   };
 }
@@ -53,10 +91,27 @@ export function GlassSurface({
   variant = 'card',
   shadow = 'soft',
 }: GlassSurfaceProps) {
-  const { blurType, blurAmount, reducedTransparencyFallbackColor, baseFrost, isSelected } =
-    blurConfig(variant);
+  const {
+    blurType,
+    blurAmount,
+    reducedTransparencyFallbackColor,
+    baseFrost,
+    borderColor,
+    borderStrong,
+    isSelected,
+  } = blurConfig(variant);
+  const isCard = isContentCardVariant(variant);
+  const useLightShadow = isLightVariant(variant) || isCard;
   const shadowStyle =
-    shadow === 'card' ? glassShadow : shadow === 'soft' ? glassShadowSoft : null;
+    shadow === 'card'
+      ? useLightShadow
+        ? lightCardShadow
+        : glassShadow
+      : shadow === 'soft'
+        ? useLightShadow
+          ? lightCardShadow
+          : glassShadowSoft
+        : null;
 
   const selectionProgress = useSharedValue(isSelected ? 1 : 0);
 
@@ -74,12 +129,19 @@ export function GlassSurface({
     opacity: selectionProgress.value,
   }));
 
+  const shellBorderStyle = isCard
+    ? styles.shellCard
+    : variant === 'selected'
+      ? styles.shellSelected
+      : styles.shellOutlined;
+
   return (
     <View
       style={[
         styles.shell,
         shadowStyle,
-        { borderRadius, borderColor: glass.borderLight, overflow: 'hidden' as const },
+        shellBorderStyle,
+        { borderRadius, overflow: 'hidden' as const },
         style,
       ]}
     >
@@ -119,7 +181,7 @@ export function GlassSurface({
         </>
       ) : (
         <>
-          <BlurView
+          <AppBlurView
             style={[StyleSheet.absoluteFill, { borderRadius }]}
             blurType={blurType}
             blurAmount={blurAmount}
@@ -143,42 +205,38 @@ export function GlassSurface({
         </>
       )}
 
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          StyleSheet.absoluteFill,
-          {
-            borderRadius,
-            borderWidth: 1,
-            borderColor: glass.borderLightStrong,
-          },
-          selectionBorderStyle,
-        ]}
-      />
+      {!isCard && variant === 'selected' ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[
+            StyleSheet.absoluteFill,
+            {
+              borderRadius,
+              borderWidth: 0,
+            },
+            selectionBorderStyle,
+          ]}
+        />
+      ) : null}
 
-      <View
-        style={[
-          styles.edgeHighlightTop,
-          { borderTopLeftRadius: borderRadius, borderTopRightRadius: borderRadius },
-        ]}
-      />
       <View style={styles.content}>{children}</View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  shell: {
-    borderWidth: 1,
+  shell: {},
+  shellCard: {
+    borderWidth: 0,
   },
-  edgeHighlightTop: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    backgroundColor: glass.highlight,
-    zIndex: 2,
+  shellOutlined: {
+    borderWidth: SURFACE.strokeWidth,
+    borderColor: SURFACE.stroke,
+  },
+  shellSelected: {
+    borderWidth: SURFACE.strokeWidth,
+    borderColor: SURFACE.optionSelectedBorder,
+    backgroundColor: SURFACE.selectedFill,
   },
   content: {
     zIndex: 3,

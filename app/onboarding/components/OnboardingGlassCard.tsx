@@ -1,8 +1,13 @@
-import { BlurView } from '@react-native-community/blur';
 import { Feather } from '@expo/vector-icons';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+
+import { AppBlurView } from '@/components/AppBlurView';
+import { OnboardingOptionWaveDecoration } from '@/app/onboarding/components/OnboardingOptionWaveDecoration';
 
 import { onboardingTheme } from '@/app/onboarding/theme';
+import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
+import { OPTION_PRIMARY } from '@/constants/buttons';
+import { SURFACE } from '@/constants/surfaces';
 import { fontSizes, fonts } from '@/constants/theme';
 import { noFocusRing } from '@/lib/focusRing';
 
@@ -11,7 +16,6 @@ type OnboardingGlassCardProps = {
   subtext?: string;
   selected: boolean;
   onPress: () => void;
-  accentBorderColor?: string;
 };
 
 export function OnboardingGlassCard({
@@ -19,69 +23,69 @@ export function OnboardingGlassCard({
   subtext,
   selected,
   onPress,
-  accentBorderColor,
 }: OnboardingGlassCardProps) {
   return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [styles.pressable, noFocusRing, pressed && styles.pressed]}
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-    >
-      <View
-        style={[
-          styles.shell,
-          selected && styles.shellSelected,
-          selected && accentBorderColor
-            ? { borderLeftWidth: 4, borderLeftColor: accentBorderColor }
-            : null,
-        ]}
+    <View style={styles.root}>
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.pressable, noFocusRing, pressed && styles.pressed]}
+        accessibilityRole="radio"
+        accessibilityState={{ selected }}
       >
-        {Platform.OS === 'web' ? (
-          <View style={[StyleSheet.absoluteFill, styles.webFrost]} />
-        ) : (
-          <BlurView
-            blurType="light"
-            blurAmount={20}
-            style={StyleSheet.absoluteFill}
-            reducedTransparencyFallbackColor={onboardingTheme.cardBg}
-          />
-        )}
-        <View style={styles.inner}>
-          <View style={styles.copy}>
-            <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
-            {subtext ? <Text style={styles.subtext}>{subtext}</Text> : null}
-          </View>
-          <View style={[styles.ring, selected && styles.ringSelected]}>
-            {selected ? <Feather name="check" size={16} color={onboardingTheme.textPrimary} /> : null}
+        <View style={[styles.shell, selected && styles.shellSelected]}>
+          {selected ? (
+            <View style={styles.deco} pointerEvents="none">
+              <OnboardingOptionWaveDecoration />
+            </View>
+          ) : (
+            <AppBlurView
+              blurType="light"
+              blurAmount={20}
+              style={StyleSheet.absoluteFill}
+              reducedTransparencyFallbackColor={onboardingTheme.cardBg}
+            />
+          )}
+          <View style={styles.inner}>
+            <View style={styles.copy}>
+              <Text style={[styles.title, selected && styles.titleSelected]}>{title}</Text>
+              {subtext ? <Text style={styles.subtext}>{subtext}</Text> : null}
+            </View>
+            <View style={[styles.ring, selected && styles.ringSelected]}>
+              {selected ? (
+                <Feather name="check" size={16} color={OPTION_PRIMARY} />
+              ) : null}
+            </View>
           </View>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  root: {
+    width: '100%',
+  },
   pressable: {
     borderRadius: 20,
-    overflow: 'hidden',
-    marginBottom: 12,
   },
   pressed: {
     opacity: 0.94,
   },
   shell: {
     borderRadius: 20,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
+    borderWidth: SURFACE.strokeWidth,
+    borderColor: SURFACE.stroke,
     overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
   },
   shellSelected: {
-    borderColor: onboardingTheme.cardBorderSelected,
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
+    ...BUTTON_OPTION_SELECTED.container,
+    borderRadius: 20,
   },
-  webFrost: {
-    backgroundColor: onboardingTheme.cardBg,
+  deco: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 0,
   },
   inner: {
     flexDirection: 'row',
@@ -101,7 +105,7 @@ const styles = StyleSheet.create({
     color: onboardingTheme.textPrimary,
   },
   titleSelected: {
-    fontFamily: fonts.semiBold,
+    ...BUTTON_OPTION_SELECTED.label,
   },
   subtext: {
     fontSize: 14,
@@ -113,13 +117,13 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(26, 36, 34, 0.15)',
+    borderWidth: SURFACE.strokeWidth,
+    borderColor: SURFACE.stroke,
     alignItems: 'center',
     justifyContent: 'center',
   },
   ringSelected: {
-    borderColor: onboardingTheme.textPrimary,
-    backgroundColor: 'rgba(26, 36, 34, 0.06)',
+    borderColor: OPTION_PRIMARY,
+    backgroundColor: BUTTON_OPTION_SELECTED.container.backgroundColor,
   },
 });

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { noFocusRing } from '@/lib/focusRing';
+import { BUTTON_OPTION_SELECTED } from '@/constants/buttons';
 import { colors, fonts, textContrast } from '@/constants/theme';
 
 type GlassStackOptionProps = {
@@ -60,6 +61,6 @@ const styles = StyleSheet.create({
     ...textContrast,
   },
   titleSelected: {
-    fontFamily: fonts.semiBold,
+    ...BUTTON_OPTION_SELECTED.label,
   },
 });

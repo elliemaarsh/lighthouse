@@ -28,7 +28,9 @@ export function useTabBarScrollBehavior(options: Options = {}) {
       setHidden(false);
       lastOffsetY.current = 0;
       scrollHidden.current = false;
-      return () => setHidden(false);
+      // Do not reset tab bar visibility on blur — the next screen's focus handler
+      // owns hidden state (e.g. check-in hides the bar; resetting here races and
+      // can leave Continue under the floating tab bar).
     }, [enabled, setHidden]),
   );
 

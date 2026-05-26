@@ -1,24 +1,35 @@
-import { appBackground } from '@/constants/gradient';
+/** Onboarding copy on mist background */
+export const ONBOARDING_TEXT = '#1A1A1A';
 
-/** Onboarding palette — matches flat app background */
+/** Placeholders, skip, disabled labels */
+export const ONBOARDING_TEXT_MUTED = 'rgba(26, 26, 26, 0.48)';
+
+/** Progress bar, inputs, pills, cards — solid white chrome */
+export const ONBOARDING_LINE = '#FFFFFF';
+
 export const onboardingTheme = {
-  background: appBackground,
-  textPrimary: '#1A2422',
-  textSecondary: 'rgba(26, 36, 34, 0.65)',
-  textMuted: 'rgba(26, 36, 34, 0.45)',
-  progressTrack: 'rgba(26, 36, 34, 0.08)',
-  progressFill: '#1A2422',
-  buttonBg: '#1A2422',
-  buttonText: '#FFFFFF',
-  cardBg: 'rgba(255, 255, 255, 0.42)',
-  cardBorder: 'rgba(255, 255, 255, 0.55)',
-  cardBorderSelected: 'rgba(26, 36, 34, 0.22)',
-  pillBg: '#FFFFFF',
-  pillSelectedBg: '#1A2422',
-  pillSelectedText: '#FFFFFF',
+  background: 'transparent',
+  textPrimary: ONBOARDING_TEXT,
+  textSecondary: ONBOARDING_TEXT,
+  textMuted: ONBOARDING_TEXT_MUTED,
+  line: ONBOARDING_LINE,
+  progressTrack: ONBOARDING_LINE,
+  progressFill: ONBOARDING_LINE,
+  buttonBg: '#FFFFFF',
+  buttonText: ONBOARDING_TEXT,
+  pillUnselectedBg: 'rgba(255,255,255,0.18)',
+  pillUnselectedBorder: ONBOARDING_LINE,
+  pillSelectedBg: 'rgba(39, 53, 158, 0.12)',
+  pillSelectedBorder: '#27359E',
+  pillSelectedText: '#27359E',
   inputBg: '#FFFFFF',
-  glowPeach: 'rgba(232, 168, 140, 0.35)',
-  roleAccentCarrying: '#C9A99A',
-  roleAccentNonCarrying: '#90A8B8',
-  roleAccentBoth: '#95B5A0',
+  inputBorder: '#1A1A1A',
+  roleAccentBoth: '#E8821A',
+  cardBg: 'rgba(20,8,3,0.3)',
+  cardBorder: '#1A1A1A',
+  cardBorderSelected: '#1A1A1A',
+  pillBg: 'rgba(255,255,255,0.18)',
+  glowPeach: 'rgba(241,78,42,0.25)',
+  roleAccentCarrying: '#F14E2A',
+  roleAccentNonCarrying: '#E8821A',
 };

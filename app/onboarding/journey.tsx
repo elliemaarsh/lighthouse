@@ -8,8 +8,9 @@ import {
   JOURNEY_OPTIONS,
 } from '@/app/onboarding/constants';
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
+import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
-import { onboardingTheme } from '@/app/onboarding/theme';
+import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
 import { fontSizes, fonts } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -50,15 +51,17 @@ export default function JourneyScreen() {
       continueDisabled={false}
       onContinue={() => router.push('/onboarding/cycle')}
     >
-      {JOURNEY_OPTIONS.map((option) => (
-        <OnboardingGlassCard
-          key={option.title}
-          title={option.title}
-          subtext={option.subtext}
-          selected={journeyType.includes(option.title)}
-          onPress={() => toggleJourneyType(option.title)}
-        />
-      ))}
+      <OnboardingOptionList>
+        {JOURNEY_OPTIONS.map((option) => (
+          <OnboardingGlassCard
+            key={option.title}
+            title={option.title}
+            subtext={option.subtext}
+            selected={journeyType.includes(option.title)}
+            onPress={() => toggleJourneyType(option.title)}
+          />
+        ))}
+      </OnboardingOptionList>
 
       <Animated.View style={[styles.ivfExpand, { height: ivfHeight, opacity: expand }]}>
         {showIvf ? (
@@ -106,24 +109,21 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   ivfPill: {
+    ...BUTTON_OPTION_UNSELECTED.container,
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 100,
-    backgroundColor: onboardingTheme.pillBg,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
   ivfPillOn: {
-    backgroundColor: onboardingTheme.pillSelectedBg,
-    borderColor: onboardingTheme.pillSelectedBg,
+    ...BUTTON_OPTION_SELECTED.container,
+    borderRadius: 100,
   },
   ivfPillText: {
+    ...BUTTON_OPTION_UNSELECTED.label,
     fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: onboardingTheme.textPrimary,
   },
   ivfPillTextOn: {
-    color: onboardingTheme.pillSelectedText,
-    fontFamily: fonts.medium,
+    ...BUTTON_OPTION_SELECTED.label,
+    fontSize: fontSizes.label,
   },
 });

@@ -4,7 +4,10 @@ import {
   LEARN_FILTER_CHIPS,
   type LearnFilterId,
 } from '@/constants/learn';
-import { colors, fonts } from '@/constants/theme';
+import {
+  BUTTON_OPTION_SELECTED,
+  BUTTON_OPTION_UNSELECTED,
+} from '@/constants/buttons';
 import { noFocusRing } from '@/lib/focusRing';
 
 type LearnFilterChipsProps = {
@@ -52,23 +55,20 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   chip: {
-    backgroundColor: colors.white,
     borderRadius: 100,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(26, 36, 34, 0.1)',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    ...BUTTON_OPTION_UNSELECTED.container,
   },
   chipSelected: {
-    backgroundColor: colors.textPrimary,
-    borderColor: colors.textPrimary,
+    ...BUTTON_OPTION_SELECTED.container,
   },
   chipLabel: {
-    fontSize: 13,
-    fontFamily: fonts.medium,
-    color: colors.textSecondary,
+    fontSize: 14,
+    letterSpacing: 0.3,
+    ...BUTTON_OPTION_UNSELECTED.label,
   },
   chipLabelSelected: {
-    color: colors.white,
+    ...BUTTON_OPTION_SELECTED.label,
   },
 });

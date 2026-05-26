@@ -1,7 +1,8 @@
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { BlurView } from '@react-native-community/blur';
 import { forwardRef, useCallback, useMemo } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+
+import { AppBlurView } from '@/components/AppBlurView';
 
 import { ExerciseSheetContent } from '@/components/partner/sheets/ExerciseSheetContent';
 import { HeatSheetContent } from '@/components/partner/sheets/HeatSheetContent';
@@ -21,20 +22,10 @@ type PartnerLogSheetProps = {
 };
 
 function SheetBackground() {
-  if (Platform.OS === 'web') {
-    return (
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { backgroundColor: 'rgba(48, 82, 130, 0.72)' },
-        ]}
-      />
-    );
-  }
   return (
-    <BlurView
+    <AppBlurView
       style={StyleSheet.absoluteFill}
-      blurType={glass.blurTypeLight}
+      blurType="light"
       blurAmount={24}
       reducedTransparencyFallbackColor="rgba(48, 82, 130, 0.85)"
     />

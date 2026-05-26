@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   prompt: {
     fontSize: fontSizes.label,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     textAlign: 'center',
     marginBottom: 20,
     ...textContrast,
@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: fontSizes.body,
     fontFamily: fonts.regular,
-    color: colors.textSecondary,
+    color: colors.textOnDarkMuted,
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 22,
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   hint: {
     fontSize: fontSizes.label,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     marginTop: 20,
     lineHeight: 18,
     textAlign: 'center',

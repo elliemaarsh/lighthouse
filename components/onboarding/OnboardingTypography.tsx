@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, type TextStyle } from 'react-native';
 
-import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
+import { onboardingTheme } from '@/app/onboarding/theme';
+import { fontSizes, fonts, spacing, typography } from '@/constants/theme';
 
 type OnboardingTypographyProps = {
   children: ReactNode;
@@ -17,12 +18,14 @@ export function OnboardingTypography({
   return <Text style={[styles[variant], style]}>{children}</Text>;
 }
 
+const textColor = onboardingTheme.textPrimary;
+
 const styles = StyleSheet.create({
   display: {
     fontSize: fontSizes.display,
     fontFamily: typography.display.fontFamily,
     letterSpacing: typography.headline.letterSpacing,
-    color: typography.headline.color,
+    color: textColor,
     lineHeight: 52,
     textAlign: 'center',
   },
@@ -30,7 +33,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.displaySm,
     fontFamily: typography.headline.fontFamily,
     letterSpacing: typography.headline.letterSpacing,
-    color: typography.headline.color,
+    color: textColor,
     lineHeight: fontSizes.displaySm * 1.2,
     marginBottom: spacing.md,
   },
@@ -38,7 +41,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.displaySm,
     fontFamily: typography.headline.fontFamily,
     letterSpacing: typography.headline.letterSpacing,
-    color: typography.headline.color,
+    color: textColor,
     lineHeight: fontSizes.displaySm * 1.2,
     marginTop: 80,
     marginBottom: spacing.md,
@@ -47,22 +50,21 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.h1,
     fontFamily: typography.headline.fontFamily,
     letterSpacing: typography.headline.letterSpacing,
-    color: typography.headline.color,
+    color: textColor,
     lineHeight: fontSizes.h1 * 1.2,
     marginBottom: spacing.lg,
   },
   subtext: {
     fontSize: fontSizes.body,
     fontFamily: typography.subtext.fontFamily,
-    color: typography.subtext.color,
+    color: textColor,
     lineHeight: typography.subtext.lineHeight,
     marginTop: spacing.md,
   },
   caption: {
     fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textMuted,
+    fontFamily: fonts.light,
+    color: textColor,
     letterSpacing: 1,
-    ...textContrast,
   },
 });

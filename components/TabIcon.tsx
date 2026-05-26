@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { StyleSheet, View } from 'react-native';
 
-import { colors } from '@/constants/theme';
+import { homeMist } from '@/constants/theme';
 
 export type TabIconName = 'home' | 'track' | 'connect' | 'learn' | 'community';
 
@@ -35,6 +35,7 @@ export function TabIcon({ name, color, focused, hovered = false }: TabIconProps)
         color={color}
         style={iconStyle}
       />
+      {focused ? <View style={styles.activeDot} /> : null}
     </View>
   );
 }
@@ -44,7 +45,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: 32,
-    height: 28,
+    height: 30,
+  },
+  activeDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: homeMist.highlight,
+    marginTop: 2,
   },
   icon: {
     opacity: 0.88,

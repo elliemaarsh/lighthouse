@@ -1,23 +1,18 @@
 import 'react-native-gesture-handler';
 import '../global.css';
 
-import {
-  Geist_300Light,
-  Geist_400Regular,
-  Geist_500Medium,
-  Geist_600SemiBold,
-  useFonts,
-} from '@expo-google-fonts/geist';
+import { Inter_200ExtraLight, Inter_300Light, useFonts } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AppRootBackground } from '@/components/AppRootBackground';
+import { FlowerBackground } from '@/components/FlowerBackground';
 import { colors } from '@/constants/theme';
 import { useOnboardingNavigation } from '@/hooks/useOnboardingNavigation';
 import { ensureLocalUserId } from '@/lib/localUserId';
+import { useTrackStore } from '@/store/useTrackStore';
 
 export { ErrorBoundary } from 'expo-router';
 
@@ -31,16 +26,15 @@ if (Platform.OS !== 'web') {
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    Geist_300Light,
-    Geist_400Regular,
-    Geist_500Medium,
-    Geist_600SemiBold,
+    Inter_200ExtraLight,
+    Inter_300Light,
   });
 
   useOnboardingNavigation();
 
   useEffect(() => {
     ensureLocalUserId();
+    useTrackStore.getState().resetIfNewDay();
   }, []);
 
   useEffect(() => {
@@ -55,8 +49,7 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <View style={styles.root}>
-        <AppRootBackground style={StyleSheet.absoluteFillObject} />
+      <FlowerBackground style={styles.root}>
         <Stack
           screenOptions={{
             headerShown: false,
@@ -72,7 +65,7 @@ export default function RootLayout() {
           <Stack.Screen name="settings" />
           <Stack.Screen name="(tabs)" />
         </Stack>
-      </View>
+      </FlowerBackground>
     </SafeAreaProvider>
   );
 }

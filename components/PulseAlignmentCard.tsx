@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native';
 
 import { alignmentMessage } from '@/lib/pulseChecks';
-import { colors, fonts } from '@/constants/theme';
+import { connectDashboard, fonts, homeMist } from '@/constants/theme';
 
 type PulseAlignmentCardProps = {
   userScore: number;
@@ -84,28 +84,28 @@ const styles = StyleSheet.create({
     paddingVertical: 28,
     borderRadius: 140,
     borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
-    backgroundColor: colors.cardUnselectedBg,
+    borderColor: homeMist.cardBorder,
+    backgroundColor: homeMist.card,
     marginVertical: 24,
   },
   kicker: {
     fontSize: 10,
     fontFamily: fonts.medium,
     letterSpacing: 2,
-    color: colors.textMuted,
+    color: connectDashboard.textMuted,
     textTransform: 'uppercase',
     marginBottom: 8,
   },
   score: {
     fontSize: 52,
     fontFamily: fonts.light,
-    color: colors.textPrimary,
+    color: connectDashboard.textPrimary,
     lineHeight: 56,
   },
   scoreOf: {
     fontSize: 22,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: connectDashboard.textMuted,
   },
   dotsRow: {
     flexDirection: 'row',
@@ -118,15 +118,15 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   dotFilled: {
-    backgroundColor: colors.textPrimary,
+    backgroundColor: connectDashboard.textPrimary,
   },
   dotEmpty: {
-    backgroundColor: colors.surface,
+    backgroundColor: connectDashboard.progressTrack,
   },
   message: {
     fontSize: 13,
     fontFamily: fonts.regular,
-    color: colors.textSecondary,
+    color: connectDashboard.textSecondary,
     textAlign: 'center',
     maxWidth: 200,
     marginTop: 8,
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   week: {
     fontSize: 11,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: connectDashboard.textMuted,
     marginTop: 6,
   },
   needsRow: {
@@ -146,23 +146,23 @@ const styles = StyleSheet.create({
   },
   needCol: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: 'rgba(26, 36, 34, 0.04)',
     borderRadius: 12,
     padding: 10,
     borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
+    borderColor: homeMist.cardBorder,
   },
   needLabel: {
     fontSize: 9,
     fontFamily: fonts.medium,
     letterSpacing: 1.5,
-    color: colors.textMuted,
+    color: connectDashboard.textMuted,
     marginBottom: 6,
   },
   needText: {
     fontSize: 12,
     fontFamily: fonts.regular,
-    color: colors.textPrimary,
+    color: connectDashboard.textPrimary,
     lineHeight: 16,
   },
 });

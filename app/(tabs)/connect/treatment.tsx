@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   phaseCardActive: {
+    borderWidth: 0.5,
     borderColor: colors.cardSelectedBorder,
     backgroundColor: colors.cardSelectedBg,
     shadowColor: '#000',

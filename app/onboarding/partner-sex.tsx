@@ -6,6 +6,7 @@ import {
   formatBiologicalSex,
 } from '@/app/onboarding/constants';
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
+import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
 import { useUserStore, type BiologicalSex } from '@/store/useUserStore';
 
@@ -28,14 +29,16 @@ export default function PartnerSexScreen() {
         router.push('/onboarding/partner-name');
       }}
     >
-      {BIOLOGICAL_SEX_OPTIONS.map((option) => (
-        <OnboardingGlassCard
-          key={option}
-          title={formatBiologicalSex(option)}
-          selected={selected === option}
-          onPress={() => setSelected(option)}
-        />
-      ))}
+      <OnboardingOptionList>
+        {BIOLOGICAL_SEX_OPTIONS.map((option) => (
+          <OnboardingGlassCard
+            key={option}
+            title={formatBiologicalSex(option)}
+            selected={selected === option}
+            onPress={() => setSelected(option)}
+          />
+        ))}
+      </OnboardingOptionList>
     </OnboardingShell>
   );
 }

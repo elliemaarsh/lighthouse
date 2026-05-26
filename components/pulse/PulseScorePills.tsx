@@ -1,6 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { colors, fonts } from '@/constants/theme';
+import {
+  BUTTON_OPTION_SELECTED,
+  BUTTON_OPTION_UNSELECTED,
+} from '@/constants/buttons';
+import { connectDashboard } from '@/constants/theme';
 
 type PulseScorePillsProps = {
   value: number | null;
@@ -26,11 +30,21 @@ export function PulseScorePills({
             <Pressable
               key={score}
               onPress={() => onChange(score)}
-              style={[styles.pill, selected && styles.pillSelected]}
+              style={[
+                styles.pill,
+                selected
+                  ? BUTTON_OPTION_SELECTED.container
+                  : BUTTON_OPTION_UNSELECTED.container,
+              ]}
               accessibilityRole="button"
               accessibilityState={{ selected }}
             >
-              <Text style={[styles.num, selected && styles.numSelected]}>
+              <Text
+                style={[
+                  styles.num,
+                  selected ? BUTTON_OPTION_SELECTED.label : BUTTON_OPTION_UNSELECTED.label,
+                ]}
+              >
                 {score}
               </Text>
             </Pressable>
@@ -58,23 +72,11 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: colors.cardUnselectedBg,
-    borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pillSelected: {
-    backgroundColor: colors.buttonPrimaryBg,
-    borderColor: colors.buttonPrimaryBg,
-  },
   num: {
     fontSize: 18,
-    fontFamily: fonts.medium,
-    color: colors.textSecondary,
-  },
-  numSelected: {
-    color: colors.white,
   },
   labels: {
     flexDirection: 'row',
@@ -84,7 +86,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 11,
-    fontFamily: fonts.regular,
-    color: colors.textMuted,
+    fontFamily: BUTTON_OPTION_UNSELECTED.label.fontFamily,
+    color: connectDashboard.textMuted,
   },
 });

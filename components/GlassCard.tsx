@@ -27,7 +27,7 @@ export function GlassCard({
           type={art}
           width={200}
           height={130}
-          tone="dark"
+          tone="light"
           placement="background"
         />
         <View style={styles.content}>{children}</View>

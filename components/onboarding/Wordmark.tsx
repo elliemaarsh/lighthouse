@@ -1,15 +1,16 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { typography } from '@/constants/theme';
+import { LighthouseLogo } from '@/components/brand/LighthouseLogo';
 
 type WordmarkProps = {
   style?: object;
+  onLightBackground?: boolean;
 };
 
-export function Wordmark({ style }: WordmarkProps) {
+export function Wordmark({ style, onLightBackground = false }: WordmarkProps) {
   return (
     <View style={[styles.wrap, style]}>
-      <Text style={styles.text}>LIGHTHOUSE</Text>
+      <LighthouseLogo onLightBackground={onLightBackground} />
     </View>
   );
 }
@@ -18,9 +19,5 @@ const styles = StyleSheet.create({
   wrap: {
     alignItems: 'center',
     marginTop: 60,
-  },
-  text: {
-    ...typography.wordmark,
-    textAlign: 'center',
   },
 });

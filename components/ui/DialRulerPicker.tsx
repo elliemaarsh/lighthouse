@@ -25,9 +25,32 @@ type DialRulerPickerProps = {
   disabled?: boolean;
   /** Shown in the large value slot when `value` is null */
   placeholderDisplay?: string;
-  /** @deprecated Both palettes use the flat light-blue surface */
-  palette?: 'gradient' | 'mist';
+  palette?: 'gradient' | 'mist' | 'checkin';
 };
+
+const PALETTES = {
+  gradient: {
+    value: colors.textOnDark,
+    muted: colors.textOnDarkFaint,
+    accent: colors.textOnDark,
+    tick: 'rgba(26, 36, 34, 0.2)',
+    tickMajor: 'rgba(26, 36, 34, 0.38)',
+  },
+  mist: {
+    value: colors.textPrimary,
+    muted: colors.textSecondary,
+    accent: colors.textPrimary,
+    tick: 'rgba(26, 36, 34, 0.2)',
+    tickMajor: 'rgba(26, 36, 34, 0.38)',
+  },
+  checkin: {
+    value: '#1A1A1A',
+    muted: 'rgba(26, 36, 34, 0.55)',
+    accent: '#EDE290',
+    tick: 'rgba(39, 53, 158, 0.28)',
+    tickMajor: '#27359E',
+  },
+} as const;
 
 function nearestIndex(values: number[], target: number): number {
   let best = 0;
@@ -57,15 +80,9 @@ export function DialRulerPicker({
   defaultValue,
   disabled = false,
   placeholderDisplay,
-  palette: _palette = 'gradient',
+  palette = 'gradient',
 }: DialRulerPickerProps) {
-  const paletteColors = {
-    value: colors.textPrimary,
-    muted: colors.textMuted,
-    accent: colors.textPrimary,
-    tick: 'rgba(26, 36, 34, 0.2)',
-    tickMajor: 'rgba(26, 36, 34, 0.38)',
-  };
+  const paletteColors = PALETTES[palette];
   const scrollRef = useRef<ScrollView>(null);
   const screenWidth = Dimensions.get('window').width;
   const tickWidth = tickWidthForCount(values.length, screenWidth);

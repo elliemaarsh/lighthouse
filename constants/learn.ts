@@ -1,7 +1,6 @@
-import { appBackground } from '@/constants/gradient';
+import { colors } from '@/constants/theme';
 
-/** Learn tab surface — slightly softer than main app blue */
-export const learnSurface = '#E8ECEE';
+export const learnSurface = colors.backgroundTransparent;
 
 export const LEARN_BACKGROUND = learnSurface;
 
@@ -30,7 +29,6 @@ export const LEARN_FILTER_CHIPS: { id: LearnFilterId; label: string }[] = [
   { id: 'endometriosis', label: 'Endometriosis' },
 ];
 
-/** Maps filter chip → article categories */
 export const LEARN_FILTER_CATEGORIES: Record<
   Exclude<LearnFilterId, 'for-you'>,
   string[]

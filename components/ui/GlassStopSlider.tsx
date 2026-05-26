@@ -206,13 +206,13 @@ const styles = StyleSheet.create({
   leftLabel: {
     fontSize: fontSizes.body,
     fontFamily: fonts.medium,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     ...textContrast,
   },
   rightValue: {
     fontSize: fontSizes.h3,
     fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     ...textContrast,
   },
   trackOuter: {
@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 10,
     fontFamily: fonts.medium,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     textAlign: 'center',
     ...textContrast,
   },

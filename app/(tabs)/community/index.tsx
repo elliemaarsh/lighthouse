@@ -16,6 +16,7 @@ import { PostCard } from '@/components/community/PostCard';
 import { seedCommunityIfEmpty } from '@/data/seedPosts';
 import { COMMUNITY_SURFACE } from '@/constants/community';
 import { routes } from '@/constants/routes';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fonts, spacing } from '@/constants/theme';
 import {
   fetchCommunityPosts,
@@ -248,14 +249,17 @@ const styles = StyleSheet.create({
   searchWrap: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.white,
+    backgroundColor: inputFieldStyle.backgroundColor,
     borderRadius: 100,
     height: 44,
     paddingHorizontal: 20,
     marginHorizontal: 24,
+    borderWidth: inputFieldStyle.borderWidth,
+    borderColor: inputFieldStyle.borderColor,
   },
   searchInput: {
     flex: 1,
+    backgroundColor: inputFieldStyle.backgroundColor,
     fontSize: 14,
     fontFamily: fonts.regular,
     color: colors.textPrimary,

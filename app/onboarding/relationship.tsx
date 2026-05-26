@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { RELATIONSHIP_OPTIONS, SOLO_JOURNEY_LABEL } from '@/app/onboarding/constants';
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
+import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -31,15 +32,17 @@ export default function RelationshipScreen() {
         router.push('/onboarding/partner-sex');
       }}
     >
-      {RELATIONSHIP_OPTIONS.map((option) => (
-        <OnboardingGlassCard
-          key={option.title}
-          title={option.title}
-          subtext={option.subtext}
-          selected={selected === option.title}
-          onPress={() => setSelected(option.title)}
-        />
-      ))}
+      <OnboardingOptionList>
+        {RELATIONSHIP_OPTIONS.map((option) => (
+          <OnboardingGlassCard
+            key={option.title}
+            title={option.title}
+            subtext={option.subtext}
+            selected={selected === option.title}
+            onPress={() => setSelected(option.title)}
+          />
+        ))}
+      </OnboardingOptionList>
     </OnboardingShell>
   );
 }

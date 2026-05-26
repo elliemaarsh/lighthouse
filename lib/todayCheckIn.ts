@@ -1,31 +1,24 @@
-import { fetchDailyLogForToday } from '@/lib/dailyLogs';
-import { ensureLocalUserId } from '@/lib/localUserId';
+import { todayLogToSummary, useTrackStore } from '@/store/useTrackStore';
 import type { TodayLogSummary } from '@/types/checkIn';
 
-/** In-memory cache for today's carrying check-in (hydrated from storage on focus). */
-let hasLoggedToday = false;
-let todayLog: TodayLogSummary | null = null;
-
+/** Bridge for callers not yet on useTrackStore */
 export const todayCheckInSession = {
-  getHasLoggedToday: () => hasLoggedToday,
-  getTodayLog: () => todayLog,
-  setLogged: (log: TodayLogSummary) => {
-    hasLoggedToday = true;
-    todayLog = log;
+  getHasLoggedToday: () => useTrackStore.getState().hasLoggedToday,
+  getTodayLog: () => {
+    const log = useTrackStore.getState().todayLog;
+    return log ? todayLogToSummary(log) : null;
   },
-  clear: () => {
-    hasLoggedToday = false;
-    todayLog = null;
+  setLogged: (summary: TodayLogSummary) => {
+    const { date: _date, ...data } = summary;
+    useTrackStore.getState().setTodayCheckIn({
+      ...data,
+      moodNote: data.moodNote ?? '',
+      temperatureNotMeasured: data.temperatureNotMeasured ?? false,
+      notes: data.notes ?? '',
+    });
   },
+  clear: () => useTrackStore.getState().clearTodayCheckIn(),
   async hydrate(userId: string | null): Promise<void> {
-    const uid = userId ?? ensureLocalUserId();
-    const { data } = await fetchDailyLogForToday(uid);
-    if (data) {
-      hasLoggedToday = true;
-      todayLog = data;
-    } else {
-      hasLoggedToday = false;
-      todayLog = null;
-    }
+    await useTrackStore.getState().hydrateFromRemote(userId);
   },
 };

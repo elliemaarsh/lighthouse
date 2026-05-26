@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@react-native-community/blur';
 import { router } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 
+import { AppBlurView } from '@/components/AppBlurView';
 import { routes } from '@/constants/routes';
 import { alignmentMessage } from '@/lib/pulseChecks';
-import { colors, connectDashboard, fontSizes, fonts, textContrast } from '@/constants/theme';
+import { colors, connectDashboard, fontSizes, fonts, homeMist, textContrast } from '@/constants/theme';
 
 type ConnectHeroCircleProps = {
   state: 'prompt' | 'waiting' | 'aligned';
@@ -130,82 +130,78 @@ export function ConnectHeroCircle({
         </>
       ) : null}
 
-      <Animated.View
-        style={[styles.outer, state === 'prompt' && circlePulseStyle]}
-      >
-      <BlurView
-        blurType="light"
-        blurAmount={24}
-        style={StyleSheet.absoluteFill}
-        reducedTransparencyFallbackColor="rgba(255,255,255,0.42)"
-      />
-      <Animated.View
-        style={[styles.borderRing, state === 'prompt' && borderGlowStyle]}
-      />
-      <Svg width={280} height={280} style={styles.decorSvg} pointerEvents="none">
-        <Circle
-          cx={220}
-          cy={58}
-          r={36}
-          stroke={connectDashboard.decoration}
-          strokeWidth={1}
-          fill="none"
+      <Animated.View style={[styles.outer, state === 'prompt' && circlePulseStyle]}>
+        <AppBlurView
+          blurType="light"
+          blurAmount={24}
+          style={StyleSheet.absoluteFill}
+          reducedTransparencyFallbackColor="#FFFFFF"
         />
-        <Circle
-          cx={248}
-          cy={48}
-          r={22}
-          stroke={connectDashboard.decoration}
-          strokeWidth={1}
-          fill="none"
+        <Animated.View
+          style={[styles.borderRing, state === 'prompt' && borderGlowStyle]}
         />
-      </Svg>
+        <Svg width={280} height={280} style={styles.decorSvg} pointerEvents="none">
+          <Circle
+            cx={220}
+            cy={58}
+            r={36}
+            stroke={connectDashboard.decoration}
+            strokeWidth={1}
+            fill="none"
+          />
+          <Circle
+            cx={248}
+            cy={48}
+            r={22}
+            stroke={connectDashboard.decoration}
+            strokeWidth={1}
+            fill="none"
+          />
+        </Svg>
 
-      <View style={styles.inner}>
-        {state === 'prompt' ? (
-          <>
-            <Text style={styles.kicker}>WEEKLY PULSE</Text>
-            <Text style={styles.question}>
-              How are we{'\n'}doing?
-            </Text>
-            <Text style={styles.sub}>Takes 30 seconds</Text>
-            <Pressable
-              style={styles.darkBtn}
-              onPress={() => router.push(routes.connectPulseCheck)}
-            >
-              <Text style={styles.darkBtnText}>Check in →</Text>
-            </Pressable>
-          </>
-        ) : null}
-
-        {state === 'waiting' ? (
-          <>
-            <Ionicons name="checkmark-circle" size={28} color={connectDashboard.sage} />
-            <Text style={styles.waitTitle}>You've checked in</Text>
-            <Text style={styles.sub}>Waiting for {partnerLabel} to answer…</Text>
-            <Animated.View
-              style={[styles.waitDot, { transform: [{ scale: waitDotPulse }] }]}
-            />
-          </>
-        ) : null}
-
-        {state === 'aligned' && alignmentScore != null ? (
-          <>
-            <Text style={styles.kicker}>ALIGNMENT</Text>
-            <Text style={styles.score}>
-              {alignmentScore}
-              <Text style={styles.scoreOf}> / 5</Text>
-            </Text>
-            <ScoreDots score={alignmentScore} />
-            <Text style={styles.alignMsg}>{alignmentMessage(alignmentScore)}</Text>
-            {onCheckInAgain ? (
-              <Pressable onPress={onCheckInAgain}>
-                <Text style={styles.ghostLink}>Check in again</Text>
+        <View style={styles.inner}>
+          {state === 'prompt' ? (
+            <>
+              <Text style={styles.kicker}>WEEKLY PULSE</Text>
+              <Text style={styles.question}>How are we{'\n'}doing?</Text>
+              <Text style={styles.sub}>Takes 30 seconds</Text>
+              <Pressable
+                style={styles.darkBtn}
+                onPress={() => router.push(routes.connectPulseCheck)}
+              >
+                <Text style={styles.darkBtnText}>Check in →</Text>
               </Pressable>
-            ) : null}
-          </>
-        ) : null}
-      </View>
+            </>
+          ) : null}
+
+          {state === 'waiting' ? (
+            <>
+              <Ionicons name="checkmark-circle" size={28} color={connectDashboard.sage} />
+              <Text style={styles.waitTitle}>You've checked in</Text>
+              <Text style={styles.sub}>Waiting for {partnerLabel} to answer…</Text>
+              <Animated.View
+                style={[styles.waitDot, { transform: [{ scale: waitDotPulse }] }]}
+              />
+            </>
+          ) : null}
+
+          {state === 'aligned' && alignmentScore != null ? (
+            <>
+              <Text style={styles.kicker}>ALIGNMENT</Text>
+              <Text style={styles.score}>
+                {alignmentScore}
+                <Text style={styles.scoreOf}> / 5</Text>
+              </Text>
+              <ScoreDots score={alignmentScore} />
+              <Text style={styles.alignMsg}>{alignmentMessage(alignmentScore)}</Text>
+              {onCheckInAgain ? (
+                <Pressable onPress={onCheckInAgain}>
+                  <Text style={styles.ghostLink}>Check in again</Text>
+                </Pressable>
+              ) : null}
+            </>
+          ) : null}
+        </View>
       </Animated.View>
     </View>
   );
@@ -244,13 +240,13 @@ const styles = StyleSheet.create({
     borderRadius: 140,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.45)',
+    borderColor: homeMist.cardBorder,
   },
   borderRing: {
     ...StyleSheet.absoluteFillObject,
     borderRadius: 140,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
+    borderColor: homeMist.cardBorder,
   },
   decorSvg: {
     position: 'absolute',
@@ -341,10 +337,10 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   dotFilled: {
-    backgroundColor: colors.white,
+    backgroundColor: connectDashboard.textPrimary,
   },
   dotEmpty: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: homeMist.dotEmpty,
   },
   alignMsg: {
     fontSize: fontSizes.label,

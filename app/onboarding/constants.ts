@@ -49,7 +49,7 @@ export const ROLE_OPTIONS = [
     title: 'We both track',
     subtext: 'We want full visibility for both of us',
     value: 'both' as const,
-    accent: '#95B5A0',
+    accent: '#E8821A',
   },
 ];
 

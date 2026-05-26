@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { noFocusRing } from '@/lib/focusRing';
+import { BUTTON_OPTION_SELECTED, OPTION_PRIMARY } from '@/constants/buttons';
+import { SURFACE } from '@/constants/surfaces';
 import {
   colors,
   fontSizes,
@@ -29,7 +31,7 @@ export function RoleCard({ title, description, selected, onPress }: RoleCardProp
       accessibilityState={{ selected }}
     >
       <GlassSurface
-        variant={selected ? 'selected' : 'card'}
+        variant={selected ? 'selected' : 'pill'}
         borderRadius={radius.card}
         shadow={selected ? 'card' : 'soft'}
         style={styles.card}
@@ -41,7 +43,7 @@ export function RoleCard({ title, description, selected, onPress }: RoleCardProp
           </View>
           <View style={[styles.ring, selected && styles.ringSelected]}>
             {selected ? (
-              <Feather name="check" size={16} color={colors.textPrimary} />
+              <Feather name="check" size={16} color={OPTION_PRIMARY} />
             ) : null}
           </View>
         </View>
@@ -82,7 +84,7 @@ const styles = StyleSheet.create({
     ...textContrast,
   },
   titleSelected: {
-    fontFamily: fonts.semiBold,
+    ...BUTTON_OPTION_SELECTED.label,
   },
   description: {
     fontSize: 14,
@@ -95,14 +97,14 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(255, 255, 255, 0.35)',
+    borderWidth: SURFACE.strokeWidth,
+    borderColor: SURFACE.stroke,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: '#FFFFFF',
   },
   ringSelected: {
-    borderColor: colors.cardSelectedBorder,
-    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    borderColor: OPTION_PRIMARY,
+    backgroundColor: BUTTON_OPTION_SELECTED.container.backgroundColor,
   },
 });

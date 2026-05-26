@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { routes } from '@/constants/routes';
 import { isClient } from '@/lib/storage';
 import { pulseDraftSession } from '@/lib/pulseDraft';
-import { todayCheckInSession } from '@/lib/todayCheckIn';
+import { useTrackStore } from '@/store/useTrackStore';
 import { useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -12,7 +12,7 @@ import { useUserStore } from '@/store/useUserStore';
 export async function resetAppForDev(): Promise<void> {
   useUserStore.getState().resetOnboarding();
   useTabBarStore.getState().setHidden(false);
-  todayCheckInSession.clear();
+  useTrackStore.getState().clearTodayCheckIn();
   pulseDraftSession.clear();
 
   if (isClient) {

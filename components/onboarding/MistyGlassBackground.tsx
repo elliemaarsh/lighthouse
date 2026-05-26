@@ -1,1 +1,1 @@
-export { AppGradientBackground as MistyGlassBackground } from '@/components/AppGradientBackground';
+export { FlowerBackground as MistyGlassBackground } from '@/components/FlowerBackground';

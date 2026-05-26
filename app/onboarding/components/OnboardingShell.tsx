@@ -18,6 +18,7 @@ type OnboardingShellProps = {
   onBack?: () => void;
   showSkip?: boolean;
   onSkip?: () => void;
+  skipLabel?: string;
   continueLabel?: string;
   onContinue?: () => void;
   continueDisabled?: boolean;
@@ -34,6 +35,7 @@ export function OnboardingShell({
   onBack,
   showSkip = false,
   onSkip,
+  skipLabel = 'Skip',
   continueLabel = 'Continue',
   onContinue,
   continueDisabled = true,
@@ -60,7 +62,7 @@ export function OnboardingShell({
         )}
         {showSkip && onSkip ? (
           <Pressable onPress={onSkip} hitSlop={12}>
-            <Text style={styles.skip}>Skip</Text>
+            <Text style={styles.skip}>{skipLabel}</Text>
           </Pressable>
         ) : (
           <View style={styles.iconBtn} />
@@ -121,10 +123,9 @@ const styles = StyleSheet.create({
   },
   skip: {
     fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: onboardingTheme.textMuted,
+    fontFamily: fonts.light,
+    color: onboardingTheme.textPrimary,
     textAlign: 'right',
-    width: 80,
   },
   progressWrap: {
     paddingHorizontal: spacing.lg,
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 32,
-    fontFamily: fonts.semiBold,
+    fontFamily: fonts.extraLight,
     color: onboardingTheme.textPrimary,
     lineHeight: 40,
     marginTop: spacing.sm,
@@ -162,6 +163,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.footer,
     gap: 12,
-    alignItems: 'flex-end',
+    alignItems: 'stretch',
+    width: '100%',
   },
 });

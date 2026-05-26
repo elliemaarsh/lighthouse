@@ -1,15 +1,17 @@
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { CheckInStepLayout } from '@/components/checkin/CheckInStepLayout';
 import { GlassPillOption } from '@/components/GlassPillOption';
-import { useCheckIn } from '@/contexts/CheckInContext';
+import { useCheckInEditMode } from '@/hooks/useCheckInEditMode';
 import { checkInSpacing } from '@/constants/checkIn';
 import { routes } from '@/constants/routes';
-import { fetchDailyLogForToday } from '@/lib/dailyLogs';
-import { ensureLocalUserId } from '@/lib/localUserId';
-import { colors, fontSizes } from '@/constants/theme';
+import {
+  hydrateCheckInStoreFromTodayLog,
+  useCheckInStore,
+} from '@/store/useCheckInStore';
+import { useTrackStore } from '@/store/useTrackStore';
 import type { PeriodStatus } from '@/types/checkIn';
 
 const OPTIONS: { index: string; label: string; value: PeriodStatus }[] = [
@@ -20,44 +22,39 @@ const OPTIONS: { index: string; label: string; value: PeriodStatus }[] = [
 ];
 
 export default function CheckInStep1() {
-  const { data, update, reset } = useCheckIn();
-  const [selected, setSelected] = useState<PeriodStatus | null>(data.periodStatus);
+  const isEdit = useCheckInEditMode();
+  const setField = useCheckInStore((s) => s.setField);
+  const periodStatus = useCheckInStore((s) => s.periodStatus);
+  const [selected, setSelected] = useState<PeriodStatus | null>(periodStatus);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    let cancelled = false;
-
-    void (async () => {
-      const { data: existing } = await fetchDailyLogForToday(ensureLocalUserId());
-      if (cancelled) return;
-
-      if (existing) {
-        const { date: _date, ...rest } = existing;
-        update(rest);
-        setSelected(rest.periodStatus);
-      } else {
-        reset();
-        setSelected(null);
+    if (isEdit) {
+      const log = useTrackStore.getState().todayLog;
+      if (log) {
+        hydrateCheckInStoreFromTodayLog(log);
+        setSelected(log.periodStatus);
       }
-      setReady(true);
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [reset, update]);
+    } else {
+      setSelected(useCheckInStore.getState().periodStatus);
+    }
+    setReady(true);
+  }, [isEdit]);
 
   const handleSelect = (value: PeriodStatus) => {
     setSelected(value);
-    update({ periodStatus: value });
+    setField('periodStatus', value);
   };
 
   const handleContinue = () => {
+    if (selected) {
+      setField('periodStatus', selected);
+    }
     router.push(routes.checkinStep2);
   };
 
   const handleSkip = () => {
-    update({ periodStatus: null });
+    setField('periodStatus', null);
     router.push(routes.checkinStep2);
   };
 
@@ -69,6 +66,7 @@ export default function CheckInStep1() {
     <CheckInStepLayout
       step={1}
       totalSteps={4}
+      editMode={isEdit}
       question="Any period activity today?"
       subtext="Select one"
       canContinue={selected !== null}

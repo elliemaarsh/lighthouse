@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PillButton } from '@/components/onboarding/PillButton';
 import { PulseScoreDial } from '@/components/pulse/PulseScoreDial';
 import {
   PULSE_CAPACITY_LABELS,
@@ -23,6 +24,7 @@ import {
   PULSE_NEED_OPTIONS,
 } from '@/constants/pulseCheck';
 import { routes } from '@/constants/routes';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fonts } from '@/constants/theme';
 import { useRevealAnimation } from '@/hooks/useRevealAnimation';
 import { partnerFirstName } from '@/lib/partnerDisplay';
@@ -175,7 +177,14 @@ export default function PulseCheckScreen() {
                         onPress={() => setCurrentNeed(option)}
                         style={[styles.needCard, selected && styles.needCardSelected]}
                       >
-                        <Text style={styles.needCardText}>{option}</Text>
+                        <Text
+                          style={[
+                            styles.needCardText,
+                            selected && styles.needCardTextSelected,
+                          ]}
+                        >
+                          {option}
+                        </Text>
                       </Pressable>
                     );
                   })}
@@ -210,15 +219,12 @@ export default function PulseCheckScreen() {
 
             {currentNeed != null ? (
               <Animated.View style={[continueReveal.style, styles.continueWrap]}>
-                <Pressable
-                  style={[styles.continueBtn, translating && styles.continueDisabled]}
+                <PillButton
+                  label={translating ? 'Translating…' : 'Continue →'}
+                  tier={2}
                   onPress={() => void handleContinue()}
                   disabled={translating}
-                >
-                  <Text style={styles.continueText}>
-                    {translating ? 'Translating…' : 'Continue →'}
-                  </Text>
-                </Pressable>
+                />
               </Animated.View>
             ) : null}
           </ScrollView>
@@ -301,22 +307,26 @@ const styles = StyleSheet.create({
   },
   needCard: {
     width: '48%',
-    backgroundColor: colors.cardUnselectedBg,
+    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
-    borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
+    borderWidth: 0.5,
+    borderColor: '#1A1A1A',
   },
   needCardSelected: {
-    backgroundColor: colors.cardSelectedBg,
-    borderColor: colors.cardSelectedBorder,
+    backgroundColor: 'rgba(39, 53, 158, 0.12)',
+    borderWidth: 0.5,
+    borderColor: '#27359E',
   },
   needCardText: {
     fontSize: 14,
-    fontFamily: fonts.regular,
-    color: colors.textPrimary,
+    fontFamily: fonts.light,
+    color: '#1A1A1A',
     textAlign: 'center',
     lineHeight: 20,
+  },
+  needCardTextSelected: {
+    color: '#27359E',
   },
   noteLabel: {
     fontSize: 14,
@@ -332,7 +342,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   noteInput: {
-    backgroundColor: colors.inputBg,
+    ...inputFieldStyle,
     borderRadius: 20,
     padding: 20,
     minHeight: 120,
@@ -340,8 +350,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: fonts.regular,
     lineHeight: 24,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
   },
   noteHint: {
     fontSize: 11,
@@ -353,24 +361,8 @@ const styles = StyleSheet.create({
   },
   continueWrap: {
     marginTop: 28,
-    alignItems: 'center',
-  },
-  continueBtn: {
-    backgroundColor: colors.buttonPrimaryBg,
-    borderRadius: 100,
-    height: 54,
-    paddingHorizontal: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
     alignSelf: 'stretch',
-  },
-  continueDisabled: {
-    opacity: 0.7,
-  },
-  continueText: {
-    fontSize: 15,
-    fontFamily: fonts.medium,
-    color: colors.white,
+    width: '100%',
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject,

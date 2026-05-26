@@ -4,7 +4,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BIRTH_CONTROL_OPTIONS } from '@/app/onboarding/constants';
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
+import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
+import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
 import { onboardingTheme } from '@/app/onboarding/theme';
 import { fontSizes, fonts } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
@@ -103,23 +105,25 @@ export default function CycleScreen() {
       <Text style={[styles.sectionLabel, styles.sectionGap]}>
         Are you using natural family planning or fertility awareness methods?
       </Text>
-      <OnboardingGlassCard
-        title="Yes — I track my cycle naturally"
-        subtext="BBT, cervical mucus, ovulation tests"
-        selected={trackingChoice === 'yes'}
-        onPress={() => {
-          setTrackingChoice('yes');
-          setNaturalCycleTracking(true);
-        }}
-      />
-      <OnboardingGlassCard
-        title="No — just getting started"
-        selected={trackingChoice === 'no'}
-        onPress={() => {
-          setTrackingChoice('no');
-          setNaturalCycleTracking(false);
-        }}
-      />
+      <OnboardingOptionList>
+        <OnboardingGlassCard
+          title="Yes — I track my cycle naturally"
+          subtext="BBT, cervical mucus, ovulation tests"
+          selected={trackingChoice === 'yes'}
+          onPress={() => {
+            setTrackingChoice('yes');
+            setNaturalCycleTracking(true);
+          }}
+        />
+        <OnboardingGlassCard
+          title="No — just getting started"
+          selected={trackingChoice === 'no'}
+          onPress={() => {
+            setTrackingChoice('no');
+            setNaturalCycleTracking(false);
+          }}
+        />
+      </OnboardingOptionList>
     </OnboardingShell>
   );
 }
@@ -162,50 +166,44 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   pill: {
+    ...BUTTON_OPTION_UNSELECTED.container,
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 100,
-    backgroundColor: onboardingTheme.pillBg,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
   pillOn: {
-    backgroundColor: onboardingTheme.pillSelectedBg,
-    borderColor: onboardingTheme.pillSelectedBg,
+    ...BUTTON_OPTION_SELECTED.container,
+    borderRadius: 100,
   },
   pillText: {
+    ...BUTTON_OPTION_UNSELECTED.label,
     fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: onboardingTheme.textPrimary,
   },
   pillTextOn: {
-    color: onboardingTheme.pillSelectedText,
-    fontFamily: fonts.medium,
+    ...BUTTON_OPTION_SELECTED.label,
+    fontSize: fontSizes.label,
   },
   binaryRow: {
     gap: 10,
     marginTop: 8,
   },
   binaryPill: {
+    ...BUTTON_OPTION_UNSELECTED.container,
     paddingVertical: 14,
     paddingHorizontal: 18,
     borderRadius: 100,
-    backgroundColor: onboardingTheme.pillBg,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
     alignItems: 'center',
   },
   binaryPillOn: {
-    backgroundColor: onboardingTheme.pillSelectedBg,
-    borderColor: onboardingTheme.pillSelectedBg,
+    ...BUTTON_OPTION_SELECTED.container,
+    borderRadius: 100,
   },
   binaryText: {
+    ...BUTTON_OPTION_UNSELECTED.label,
     fontSize: fontSizes.body,
-    fontFamily: fonts.regular,
-    color: onboardingTheme.textPrimary,
   },
   binaryTextOn: {
-    color: onboardingTheme.pillSelectedText,
-    fontFamily: fonts.medium,
+    ...BUTTON_OPTION_SELECTED.label,
+    fontSize: fontSizes.body,
   },
 });

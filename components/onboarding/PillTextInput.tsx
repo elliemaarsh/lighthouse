@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { StyleSheet, TextInput, type TextInputProps } from 'react-native';
 
-import { GlassSurface } from '@/components/GlassSurface';
+import { inputFieldStyle, SURFACE } from '@/constants/surfaces';
 import { colors, fontSizes, radius, typography } from '@/constants/theme';
 
 type PillTextInputProps = TextInputProps;
@@ -10,41 +10,33 @@ export function PillTextInput({ style, onFocus, onBlur, ...props }: PillTextInpu
   const [focused, setFocused] = useState(false);
 
   return (
-    <GlassSurface variant="input" borderRadius={radius.pill} shadow="soft">
-      <View style={[styles.wrap, focused && styles.wrapFocused]}>
-        <TextInput
-          placeholderTextColor={colors.textMuted}
-          onFocus={(e) => {
-            setFocused(true);
-            onFocus?.(e);
-          }}
-          onBlur={(e) => {
-            setFocused(false);
-            onBlur?.(e);
-          }}
-          style={[styles.input, style]}
-          {...props}
-        />
-      </View>
-    </GlassSurface>
+    <TextInput
+      placeholderTextColor={colors.textMuted}
+      onFocus={(e) => {
+        setFocused(true);
+        onFocus?.(e);
+      }}
+      onBlur={(e) => {
+        setFocused(false);
+        onBlur?.(e);
+      }}
+      style={[styles.input, focused && styles.inputFocused, style]}
+      {...props}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    borderColor: 'transparent',
-  },
-  wrapFocused: {
-    borderColor: colors.inputBorderFocused,
-  },
   input: {
-    backgroundColor: 'transparent',
+    ...inputFieldStyle,
     height: 56,
+    borderRadius: radius.pill,
     paddingHorizontal: 24,
     fontSize: fontSizes.body,
     fontFamily: typography.subtext.fontFamily,
     color: colors.textPrimary,
+  },
+  inputFocused: {
+    borderColor: SURFACE.stroke,
   },
 });

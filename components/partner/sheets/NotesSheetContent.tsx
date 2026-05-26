@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 
 import { GlassChip } from '@/components/GlassChip';
-import { GlassSurface } from '@/components/GlassSurface';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { NOTE_QUICK_INSERTS } from '@/constants/partner';
 import { colors, fontSizes, fonts, radius, textContrast } from '@/constants/theme';
@@ -30,17 +30,15 @@ export function NotesSheetContent({ log, onSave }: NotesSheetContentProps) {
 
   return (
     <PartnerSheetShell title="Notes" onSave={handleSave}>
-      <GlassSurface variant="input" borderRadius={radius.card} shadow="none" style={styles.inputShell}>
-        <TextInput
-          value={notes}
-          onChangeText={setNotes}
-          placeholder="How are you feeling today?"
-          placeholderTextColor={colors.textMuted}
-          multiline
-          style={styles.input}
-          textAlignVertical="top"
-        />
-      </GlassSurface>
+      <TextInput
+        value={notes}
+        onChangeText={setNotes}
+        placeholder="How are you feeling today?"
+        placeholderTextColor={colors.textMuted}
+        multiline
+        style={styles.input}
+        textAlignVertical="top"
+      />
       <View style={styles.quickRow}>
         {NOTE_QUICK_INSERTS.map((text) => (
           <GlassChip
@@ -57,10 +55,10 @@ export function NotesSheetContent({ log, onSave }: NotesSheetContentProps) {
 }
 
 const styles = StyleSheet.create({
-  inputShell: {
-    width: '100%',
-  },
   input: {
+    ...inputFieldStyle,
+    width: '100%',
+    borderRadius: radius.card,
     minHeight: 160,
     padding: 20,
     fontSize: fontSizes.body,

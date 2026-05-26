@@ -3,6 +3,7 @@ import { useState } from 'react';
 
 import { ROLE_OPTIONS } from '@/app/onboarding/constants';
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
+import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
 import { useUserStore, type UserRole } from '@/store/useUserStore';
 
@@ -24,16 +25,17 @@ export default function RoleScreen() {
         router.push('/onboarding/goals');
       }}
     >
-      {ROLE_OPTIONS.map((option) => (
-        <OnboardingGlassCard
-          key={option.value}
-          title={option.title}
-          subtext={option.subtext}
-          selected={selected === option.value}
-          accentBorderColor={selected === option.value ? option.accent : undefined}
-          onPress={() => setSelected(option.value)}
-        />
-      ))}
+      <OnboardingOptionList>
+        {ROLE_OPTIONS.map((option) => (
+          <OnboardingGlassCard
+            key={option.value}
+            title={option.title}
+            subtext={option.subtext}
+            selected={selected === option.value}
+            onPress={() => setSelected(option.value)}
+          />
+        ))}
+      </OnboardingOptionList>
     </OnboardingShell>
   );
 }

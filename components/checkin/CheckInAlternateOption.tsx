@@ -1,8 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 
-import { GlassSurface } from '@/components/GlassSurface';
+import { BUTTON_OPTION_SELECTED, BUTTON_TIER_1 } from '@/constants/buttons';
 import { noFocusRing } from '@/lib/focusRing';
-import { colors, fontSizes, fonts, radius, textContrast, typography } from '@/constants/theme';
+import { radius } from '@/constants/theme';
 
 type CheckInAlternateOptionProps = {
   label: string;
@@ -22,15 +22,7 @@ export function CheckInAlternateOption({
       accessibilityRole="button"
       accessibilityState={{ selected }}
     >
-      <GlassSurface
-        variant={selected ? 'selected' : 'pill'}
-        borderRadius={radius.pill}
-        shadow={selected ? 'soft' : 'none'}
-      >
-        <View style={styles.inner}>
-          <Text style={[styles.text, selected && styles.textSelected]}>{label}</Text>
-        </View>
-      </GlassSurface>
+      <Text style={[styles.text, selected && styles.textSelected]}>{label}</Text>
     </Pressable>
   );
 }
@@ -40,19 +32,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     marginTop: 28,
     borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  inner: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    ...BUTTON_TIER_1.container,
   },
   text: {
-    fontSize: fontSizes.label,
-    fontFamily: typography.subtext.fontFamily,
-    color: colors.textSecondary,
-    ...textContrast,
+    ...BUTTON_TIER_1.label,
+    opacity: 0.55,
   },
   textSelected: {
-    color: colors.textPrimary,
+    ...BUTTON_OPTION_SELECTED.label,
+    opacity: 1,
   },
 });

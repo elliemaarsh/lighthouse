@@ -50,6 +50,7 @@ export function TemperatureRulerPicker({
       formatValue={formatTemp}
       defaultValue={defaultForUnit(unit)}
       disabled={disabled}
+      palette="checkin"
     />
   );
 }

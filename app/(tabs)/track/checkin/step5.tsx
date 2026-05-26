@@ -11,34 +11,47 @@ import {
   View,
 } from 'react-native';
 
+import { useCheckInEditMode } from '@/hooks/useCheckInEditMode';
 import { CheckInStepLayout } from '@/components/checkin/CheckInStepLayout';
-import { GlassSurface } from '@/components/GlassSurface';
-import { useCheckIn } from '@/contexts/CheckInContext';
+import { stashCheckInCompletionSnapshot } from '@/lib/checkInComplete';
+import {
+  checkInDraftToData,
+  useCheckInStore,
+} from '@/store/useCheckInStore';
 import { checkInSpacing } from '@/constants/checkIn';
 import { routes } from '@/constants/routes';
-import { colors, fontSizes, fonts, radius, textContrast, typography } from '@/constants/theme';
+import { BUTTON_TIER_1 } from '@/constants/buttons';
+import { inputFieldStyle } from '@/constants/surfaces';
+import { colors, fontSizes, fonts, radius, typography } from '@/constants/theme';
 import { noFocusRing } from '@/lib/focusRing';
 
 const PROMPTS = ['Feeling hopeful', 'Hard day emotionally', 'Grateful today'];
 
 export default function CheckInStep5() {
-  const { data, update } = useCheckIn();
-  const [notes, setNotes] = useState(data.notes);
+  const isEdit = useCheckInEditMode();
+  const draft = useCheckInStore();
+  const setField = useCheckInStore((s) => s.setField);
+  const [notes, setNotes] = useState(draft.notes);
 
   const appendPrompt = (text: string) => {
     const next = notes.trim() ? `${notes.trim()} ${text}` : text;
     setNotes(next);
-    update({ notes: next });
+    setField('notes', next);
+  };
+
+  const goToComplete = () => {
+    stashCheckInCompletionSnapshot(checkInDraftToData(useCheckInStore.getState()));
+    router.push(routes.checkinComplete);
   };
 
   const handleContinue = () => {
-    update({ notes: notes.trim() });
-    router.push(routes.checkinComplete);
+    setField('notes', notes.trim());
+    goToComplete();
   };
 
   const handleSkip = () => {
-    update({ notes: '' });
-    router.push(routes.checkinComplete);
+    setField('notes', '');
+    goToComplete();
   };
 
   return (
@@ -49,48 +62,39 @@ export default function CheckInStep5() {
       <CheckInStepLayout
         step={4}
         totalSteps={4}
+        editMode={isEdit}
         question="Anything else on your mind?"
         subtext="This is your space. No one else sees this unless you choose to share."
         canContinue
         onContinue={handleContinue}
         onSkip={handleSkip}
         skipLabel="Nothing to add"
+        continueLabel={isEdit ? 'Save' : 'Continue →'}
       >
         <ScrollView
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.scroll}
         >
-          <GlassSurface
-            variant="input"
-            borderRadius={20}
-            shadow="soft"
-            style={styles.inputGlass}
-          >
-            <TextInput
-              value={notes}
-              onChangeText={(text) => {
-                setNotes(text);
-                update({ notes: text });
-              }}
-              placeholder="Write freely..."
-              placeholderTextColor={colors.textMuted}
-              multiline
-              style={styles.input}
-            />
-          </GlassSurface>
+          <TextInput
+            value={notes}
+            onChangeText={(text) => {
+              setNotes(text);
+              setField('notes', text);
+            }}
+            placeholder="Write freely..."
+            placeholderTextColor={colors.textMuted}
+            multiline
+            style={styles.input}
+          />
           <View style={styles.prompts}>
             {PROMPTS.map((prompt) => (
               <Pressable
                 key={prompt}
                 onPress={() => appendPrompt(prompt)}
-                style={[styles.promptWrap, noFocusRing]}
+                style={[styles.promptPill, noFocusRing]}
               >
-                <GlassSurface variant="pill" borderRadius={radius.pill} shadow="none">
-                  <View style={styles.promptInner}>
-                    <Text style={styles.promptText}>{prompt}</Text>
-                  </View>
-                </GlassSurface>
+                <Text style={styles.promptText}>{prompt}</Text>
               </Pressable>
             ))}
           </View>
@@ -108,36 +112,27 @@ const styles = StyleSheet.create({
   scroll: {
     paddingBottom: checkInSpacing.sectionGap,
   },
-  inputGlass: {
-    marginBottom: checkInSpacing.sectionGap,
-  },
   input: {
-    backgroundColor: 'transparent',
+    ...inputFieldStyle,
+    borderRadius: 16,
     padding: 22,
     minHeight: 160,
     fontSize: 15,
     fontFamily: typography.subtext.fontFamily,
-    color: colors.textPrimary,
+    color: '#1A1A1A',
     textAlignVertical: 'top',
-    ...textContrast,
+    marginBottom: checkInSpacing.sectionGap,
   },
   prompts: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: checkInSpacing.promptGap,
   },
-  promptWrap: {
+  promptPill: {
+    ...BUTTON_TIER_1.container,
     borderRadius: radius.pill,
-    overflow: 'hidden',
-  },
-  promptInner: {
-    paddingVertical: 12,
-    paddingHorizontal: 18,
   },
   promptText: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textMuted,
-    ...textContrast,
+    ...BUTTON_TIER_1.label,
   },
 });

@@ -17,44 +17,75 @@
 
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { GlassSurface } from '@/components/GlassSurface';
 import { PillButton } from '@/components/onboarding/PillButton';
-import { useCheckIn } from '@/contexts/CheckInContext';
+import {
+  clearCheckInCompletionSnapshot,
+  stashCheckInCompletionSnapshot,
+  takeCheckInCompletionSnapshot,
+} from '@/lib/checkInComplete';
 import { saveDailyLog, getTodayDateString } from '@/lib/dailyLogs';
 import { ensureLocalUserId } from '@/lib/localUserId';
 import { publishCarryingPartnerSharedLog } from '@/lib/partnerSharedLog';
-import { todayCheckInSession } from '@/lib/todayCheckIn';
 import { routes } from '@/constants/routes';
 import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
+import {
+  checkInDraftToData,
+  useCheckInStore,
+} from '@/store/useCheckInStore';
+import { useTrackStore } from '@/store/useTrackStore';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function CheckInCompleteScreen() {
-  const { data, reset } = useCheckIn();
   const userId = useUserStore((s) => s.userId);
   const role = useUserStore((s) => s.role);
+  const setTodayCheckIn = useTrackStore((s) => s.setTodayCheckIn);
   const [saved, setSaved] = useState(false);
+  const saveStarted = useRef(false);
 
   useEffect(() => {
+    if (saveStarted.current) return;
+    saveStarted.current = true;
+
+    const draft = useCheckInStore.getState();
+    const snapshot =
+      takeCheckInCompletionSnapshot() ?? stashCheckInCompletionSnapshot(checkInDraftToData(draft));
+
+    console.log('Saving check-in:', {
+      periodStatus: snapshot.periodStatus,
+      temperature: snapshot.temperature,
+      tempUnit: snapshot.tempUnit,
+      mood: snapshot.mood,
+      symptoms: snapshot.symptoms,
+      notes: snapshot.notes,
+    });
+
     let mounted = true;
-    const snapshot = { ...data };
 
     const persist = async () => {
       const uid = userId ?? ensureLocalUserId();
-      await saveDailyLog(uid, snapshot);
-      const logged = {
-        ...snapshot,
-        date: getTodayDateString(),
-      };
-      if (role === 'carrying' || role === 'both') {
-        await publishCarryingPartnerSharedLog(logged);
+      const { error } = await saveDailyLog(uid, snapshot);
+      if (error) {
+        console.warn('[Lighthouse] check-in save error:', error.message);
+      } else {
+        console.log('[Lighthouse] check-in saved for', getTodayDateString());
       }
+
+      if (role === 'carrying' || role === 'both') {
+        await publishCarryingPartnerSharedLog({
+          ...snapshot,
+          date: getTodayDateString(),
+        });
+      }
+
       if (mounted) {
-        todayCheckInSession.setLogged(logged);
-        reset();
+        setTodayCheckIn(snapshot);
+        useCheckInStore.getState().reset();
+        clearCheckInCompletionSnapshot();
         setSaved(true);
       }
     };
@@ -64,14 +95,20 @@ export default function CheckInCompleteScreen() {
     return () => {
       mounted = false;
     };
-  }, [data, reset, role, userId]);
+  }, [role, setTodayCheckIn, userId]);
 
-  const goHome = () => {
-    router.replace(routes.track);
-  };
+  useEffect(() => {
+    if (!saved) return;
 
-  const viewSummary = () => {
-    router.replace(routes.track);
+    const timer = setTimeout(() => {
+      router.dismissTo(routes.track);
+    }, 1200);
+
+    return () => clearTimeout(timer);
+  }, [saved]);
+
+  const goToTrack = () => {
+    router.dismissTo(routes.track);
   };
 
   return (
@@ -90,8 +127,12 @@ export default function CheckInCompleteScreen() {
       </View>
 
       <View style={styles.footer}>
-        <PillButton label="View today's summary" variant="ghost" onPress={viewSummary} />
-        <PillButton label="Back to home" onPress={goHome} style={styles.primarySpacing} />
+        <PillButton
+          label="View today's summary"
+          onPress={goToTrack}
+          disabled={!saved}
+          tier={2}
+        />
       </View>
     </SafeAreaView>
   );
@@ -140,8 +181,5 @@ const styles = StyleSheet.create({
   footer: {
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.footer,
-  },
-  primarySpacing: {
-    marginTop: 12,
   },
 });

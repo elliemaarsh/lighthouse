@@ -22,6 +22,7 @@ import {
   SUGGESTED_POST_TAGS,
 } from '@/constants/community';
 import { routes } from '@/constants/routes';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fonts, spacing } from '@/constants/theme';
 import { createCommunityPost, getCommunityUserId } from '@/lib/community';
 import { noFocusRing } from '@/lib/focusRing';
@@ -179,7 +180,7 @@ export default function NewPostScreen() {
             label={posting ? 'Posting...' : 'Post to community'}
             onPress={() => void handlePost()}
             disabled={!title.trim() || posting}
-            variant="primary"
+            tier={2}
             style={styles.postBtn}
           />
         </View>
@@ -237,7 +238,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   titleInput: {
-    backgroundColor: colors.white,
+    ...inputFieldStyle,
     borderRadius: 16,
     padding: 16,
     fontSize: 16,
@@ -245,7 +246,7 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
   },
   bodyInput: {
-    backgroundColor: colors.white,
+    ...inputFieldStyle,
     borderRadius: 16,
     padding: 16,
     minHeight: 140,
@@ -266,8 +267,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tagField: {
+    ...inputFieldStyle,
     flex: 1,
-    backgroundColor: colors.white,
     borderRadius: 100,
     paddingHorizontal: 16,
     height: 44,
@@ -324,8 +325,8 @@ const styles = StyleSheet.create({
     borderRadius: 100,
     paddingVertical: 8,
     paddingHorizontal: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(26, 36, 34, 0.1)',
+    borderWidth: 0.5,
+    borderColor: '#1A1A1A',
   },
   suggestedText: {
     fontSize: 13,

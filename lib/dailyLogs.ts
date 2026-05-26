@@ -60,10 +60,21 @@ export async function fetchDailyLogForToday(
     return { data: local, error: null };
   }
 
-  const merged: TodayLogSummary = {
-    ...rowToCheckInData(remote as DailyLogRow, local ?? undefined),
-    date,
-  };
+  const fromRemote = rowToCheckInData(remote as DailyLogRow, local ?? undefined);
+  const merged: TodayLogSummary = local
+    ? {
+        periodStatus: fromRemote.periodStatus ?? local.periodStatus,
+        temperature: fromRemote.temperature ?? local.temperature,
+        temperatureNotMeasured:
+          fromRemote.temperatureNotMeasured || local.temperatureNotMeasured,
+        tempUnit: fromRemote.tempUnit ?? local.tempUnit,
+        mood: fromRemote.mood ?? local.mood,
+        moodNote: fromRemote.moodNote || local.moodNote,
+        symptoms: fromRemote.symptoms?.length ? fromRemote.symptoms : local.symptoms,
+        notes: fromRemote.notes || local.notes,
+        date,
+      }
+    : { ...fromRemote, date };
   return { data: merged, error: null };
 }
 
@@ -95,7 +106,7 @@ export async function saveDailyLog(
 
   if (error) {
     console.warn('[Lighthouse] daily_logs save (local ok):', error.message);
-    return { error: null };
+    return { error: new Error(error.message) };
   }
 
   return { error: null };

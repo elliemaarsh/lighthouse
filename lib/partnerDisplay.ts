@@ -65,7 +65,7 @@ export function formatHeatValue(log: PartnerLogData): {
   color: string;
 } {
   if (!log.heatLevel) {
-    return { text: '—', color: colors.textPrimary };
+    return { text: '—', color: colors.textOnDark };
   }
   const label = log.heatLevel.charAt(0).toUpperCase() + log.heatLevel.slice(1);
   const color =
@@ -82,16 +82,16 @@ export function formatSubstancesValue(log: PartnerLogData): {
   color: string;
 } {
   if (!log.substances.length) {
-    return { text: '—', color: colors.textPrimary };
+    return { text: '—', color: colors.textOnDark };
   }
   if (log.substances.includes('None')) {
     return { text: 'None', color: colors.substancesNone };
   }
   const filtered = log.substances.filter((s) => s !== 'None');
   if (filtered.length <= 2) {
-    return { text: filtered.join(', '), color: colors.textPrimary };
+    return { text: filtered.join(', '), color: colors.textOnDark };
   }
-  return { text: `${filtered.length} logged`, color: colors.textPrimary };
+  return { text: `${filtered.length} logged`, color: colors.textOnDark };
 }
 
 export function formatStressValue(log: PartnerLogData): string {

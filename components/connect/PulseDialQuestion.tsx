@@ -88,6 +88,7 @@ const styles = StyleSheet.create({
   },
   pillOn: {
     backgroundColor: colors.cardSelectedBg,
+    borderWidth: 0.5,
     borderColor: colors.cardSelectedBorder,
   },
   pillText: {
@@ -96,6 +97,7 @@ const styles = StyleSheet.create({
     color: connectDashboard.textPrimary,
   },
   pillTextOn: {
-    color: connectDashboard.buttonText,
+    color: colors.cardSelectedBorder,
+    fontFamily: fonts.light,
   },
 });

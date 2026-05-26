@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
   prompt: {
     fontSize: fontSizes.label,
     fontFamily: fonts.regular,
-    color: colors.textMuted,
+    color: colors.textOnDarkFaint,
     textAlign: 'center',
     marginBottom: 20,
     ...textContrast,
@@ -73,21 +73,21 @@ const styles = StyleSheet.create({
   readoutNum: {
     fontSize: 56,
     fontFamily: typography.display.fontFamily,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     letterSpacing: 2,
     ...textContrast,
   },
   readoutLabel: {
     fontSize: fontSizes.h3,
     fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
+    color: colors.textOnDark,
     marginTop: 4,
     ...textContrast,
   },
   readoutDesc: {
     fontSize: fontSizes.label,
     fontFamily: fonts.regular,
-    color: colors.textSecondary,
+    color: colors.textOnDarkMuted,
     marginTop: 6,
     textAlign: 'center',
     lineHeight: 20,

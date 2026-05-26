@@ -13,7 +13,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { PillButton } from '@/components/onboarding/PillButton';
 import { resetAppForDev } from '@/lib/resetApp';
-import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
+import {
+  colors,
+  fontSizes,
+  fonts,
+  spacing,
+  typography,
+} from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function SettingsScreen() {
@@ -101,8 +107,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontFamily: fonts.semiBold,
-    color: colors.textPrimary,
-    ...textContrast,
+    color: colors.textOnDark,
   },
   scroll: {
     flexGrow: 1,
@@ -119,13 +124,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     marginBottom: 6,
-    ...textContrast,
   },
   value: {
     fontSize: fontSizes.body,
     fontFamily: fonts.regular,
     color: colors.textPrimary,
-    ...textContrast,
   },
   devSection: {
     marginTop: 'auto',

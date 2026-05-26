@@ -15,8 +15,10 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { PillButton } from '@/components/onboarding/PillButton';
 import { COMMUNITY_SURFACE } from '@/constants/community';
 import { routes } from '@/constants/routes';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, fontSizes, fonts } from '@/constants/theme';
 import {
   communityUsernameError,
@@ -28,11 +30,14 @@ import {
   isUsernameTaken,
 } from '@/lib/community';
 import { noFocusRing } from '@/lib/focusRing';
-import { useTabBarStore } from '@/store/useTabBarStore';
+import { hrefForTab, useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
+
+const USERNAME_VALID_COLOR = '#3A8F6E';
 
 export default function CommunitySetupScreen() {
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
+  const lastTab = useTabBarStore((s) => s.lastTab);
   const completeCommunitySetup = useUserStore((s) => s.completeCommunitySetup);
   const hasSetUpCommunity = useUserStore((s) => s.hasSetUpCommunity);
 
@@ -53,6 +58,14 @@ export default function CommunitySetupScreen() {
 
   const validationError = communityUsernameError(username);
   const valid = isValidCommunityUsername(username);
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+      return;
+    }
+    router.navigate(hrefForTab(lastTab));
+  };
 
   const handleEnter = async () => {
     if (!valid || submitting) return;
@@ -83,6 +96,16 @@ export default function CommunitySetupScreen() {
   return (
     <View style={styles.root}>
       <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+        <Pressable
+          onPress={handleBack}
+          hitSlop={12}
+          style={[styles.backBtn, noFocusRing]}
+          accessibilityRole="button"
+          accessibilityLabel="Go back"
+        >
+          <Ionicons name="chevron-back" size={22} color={colors.textPrimary} />
+        </Pressable>
+
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -94,13 +117,6 @@ export default function CommunitySetupScreen() {
 
             <Text style={styles.body}>
               We ask that you create a username before entering our community forum.
-              You don't have to post — you're welcome to simply read and find comfort
-              in knowing others are on similar journeys.
-            </Text>
-            <Text style={styles.body}>
-              Your username protects your privacy and helps us maintain a safe,
-              respectful space for everyone here. It is not connected to your real name
-              or any identifying information.
             </Text>
 
             <View style={styles.guidelinesShell}>
@@ -144,26 +160,25 @@ export default function CommunitySetupScreen() {
                 <Text style={styles.error}>{takenError}</Text>
               ) : valid ? (
                 <View style={styles.validRow}>
-                  <Ionicons name="checkmark-circle" size={16} color={colors.loggedDot} />
+                  <Ionicons
+                    name="checkmark-circle"
+                    size={16}
+                    color={USERNAME_VALID_COLOR}
+                  />
                   <Text style={styles.validText}>Username looks good</Text>
                 </View>
               ) : null}
 
-              <Pressable
-                onPress={() => void handleEnter()}
-                disabled={!valid || submitting}
-                style={[
-                  styles.enterBtn,
-                  (!valid || submitting) && styles.enterBtnDisabled,
-                  noFocusRing,
-                ]}
-              >
-                {submitting ? (
-                  <ActivityIndicator color={colors.white} />
-                ) : (
-                  <Text style={styles.enterLabel}>Enter the community</Text>
-                )}
-              </Pressable>
+              {submitting ? (
+                <ActivityIndicator color="#27359E" style={styles.enterSpinner} />
+              ) : (
+                <PillButton
+                  label="Enter the community"
+                  tier={2}
+                  onPress={() => void handleEnter()}
+                  disabled={!valid || submitting}
+                />
+              )}
             </View>
           </View>
         </KeyboardAvoidingView>
@@ -180,13 +195,29 @@ const styles = StyleSheet.create({
   safe: {
     flex: 1,
   },
+  backBtn: {
+    alignSelf: 'flex-start',
+    marginLeft: 16,
+    marginTop: 8,
+    marginBottom: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 0.5,
+    borderColor: '#1A1A1A',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   flex: {
     flex: 1,
   },
   center: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 32,
+    width: '100%',
   },
   wordmark: {
     fontSize: 10,
@@ -202,6 +233,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.semiBold,
     color: colors.textPrimary,
     marginBottom: 16,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
   body: {
     fontSize: 16,
@@ -209,12 +242,14 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     lineHeight: 26,
     marginBottom: 16,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
   guidelinesShell: {
+    alignSelf: 'stretch',
     borderRadius: 16,
     overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.cardUnselectedBorder,
+    borderWidth: 0,
     marginTop: 8,
     padding: 16,
   },
@@ -230,59 +265,53 @@ const styles = StyleSheet.create({
   },
   inputSection: {
     marginTop: 32,
+    alignSelf: 'stretch',
+    alignItems: 'center',
   },
   inputLabel: {
     fontSize: 14,
     fontFamily: fonts.regular,
     color: colors.textSecondary,
     marginBottom: 8,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
   input: {
-    backgroundColor: colors.white,
+    ...inputFieldStyle,
+    alignSelf: 'stretch',
     borderRadius: 100,
     height: 54,
     paddingHorizontal: 24,
     fontSize: 16,
     fontFamily: fonts.regular,
     color: colors.textPrimary,
-    borderWidth: 1,
-    borderColor: colors.inputBorder,
   },
   inputFocused: {
-    borderColor: colors.inputBorderFocused,
+    borderColor: inputFieldStyle.borderColor,
   },
   error: {
     fontSize: 12,
     fontFamily: fonts.regular,
     color: colors.accentRose,
     marginTop: 8,
+    textAlign: 'center',
+    alignSelf: 'stretch',
   },
   validRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
     gap: 6,
     marginTop: 8,
+    alignSelf: 'stretch',
   },
   validText: {
     fontSize: 12,
     fontFamily: fonts.regular,
-    color: colors.loggedDot,
+    color: USERNAME_VALID_COLOR,
   },
-  enterBtn: {
+  enterSpinner: {
     marginTop: 24,
-    backgroundColor: colors.buttonPrimaryBg,
-    borderRadius: 100,
-    height: 54,
-    alignItems: 'center',
-    justifyContent: 'center',
-    alignSelf: 'stretch',
-  },
-  enterBtnDisabled: {
-    opacity: 0.35,
-  },
-  enterLabel: {
-    fontSize: fontSizes.body,
-    fontFamily: fonts.semiBold,
-    color: colors.white,
+    alignSelf: 'center',
   },
 });

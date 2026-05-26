@@ -10,11 +10,12 @@ import {
   View,
 } from 'react-native';
 
+import { useCheckInEditMode } from '@/hooks/useCheckInEditMode';
 import { CheckInStepLayout } from '@/components/checkin/CheckInStepLayout';
 import { GlassChip } from '@/components/GlassChip';
-import { GlassSurface } from '@/components/GlassSurface';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { MoodFace } from '@/components/MoodFace';
-import { useCheckIn } from '@/contexts/CheckInContext';
+import { useCheckInStore } from '@/store/useCheckInStore';
 import { checkInSpacing } from '@/constants/checkIn';
 import { routes } from '@/constants/routes';
 import { colors, fontSizes, fonts, spacing, textContrast, typography } from '@/constants/theme';
@@ -43,14 +44,17 @@ const SYMPTOMS = [
 const NO_SYMPTOMS = 'No symptoms';
 
 export default function CheckInStep3() {
-  const { data, update } = useCheckIn();
-  const [mood, setMood] = useState<number | null>(data.mood);
-  const [moodNote, setMoodNote] = useState(data.moodNote);
-  const [symptoms, setSymptoms] = useState<string[]>(data.symptoms);
+  const isEdit = useCheckInEditMode();
+  const draft = useCheckInStore();
+  const setField = useCheckInStore((s) => s.setField);
+  const setFields = useCheckInStore((s) => s.setFields);
+  const [mood, setMood] = useState<number | null>(draft.mood);
+  const [moodNote, setMoodNote] = useState(draft.moodNote);
+  const [symptoms, setSymptoms] = useState<string[]>(draft.symptoms);
 
   const handleSelectMood = (level: 1 | 2 | 3 | 4 | 5) => {
     setMood(level);
-    update({ mood: level });
+    setField('mood', level);
   };
 
   const toggleSymptom = (symptom: string) => {
@@ -68,16 +72,16 @@ export default function CheckInStep3() {
     }
 
     setSymptoms(next);
-    update({ symptoms: next });
+    setField('symptoms', next);
   };
 
   const handleContinue = () => {
-    update({ mood, moodNote: moodNote.trim(), symptoms });
+    setFields({ mood, moodNote: moodNote.trim(), symptoms });
     router.push(routes.checkinStep4Notes);
   };
 
   const handleSkip = () => {
-    update({ mood: null, moodNote: '', symptoms: [] });
+    setFields({ mood: null, moodNote: '', symptoms: [] });
     router.push(routes.checkinStep4Notes);
   };
 
@@ -89,6 +93,7 @@ export default function CheckInStep3() {
       <CheckInStepLayout
         step={3}
         totalSteps={4}
+        editMode={isEdit}
         question="How are you feeling today?"
         canContinue={mood !== null}
         onContinue={handleContinue}
@@ -112,19 +117,17 @@ export default function CheckInStep3() {
               </View>
             ))}
           </View>
-          <GlassSurface variant="input" borderRadius={20} shadow="soft">
-            <TextInput
-              value={moodNote}
-              onChangeText={(text) => {
-                setMoodNote(text);
-                update({ moodNote: text });
-              }}
-              placeholder="Add a note about your mood... (optional)"
-              placeholderTextColor={colors.textMuted}
-              multiline
-              style={styles.noteInput}
-            />
-          </GlassSurface>
+          <TextInput
+            value={moodNote}
+            onChangeText={(text) => {
+              setMoodNote(text);
+              setField('moodNote', text);
+            }}
+            placeholder="Add a note about your mood... (optional)"
+            placeholderTextColor={colors.textMuted}
+            multiline
+            style={styles.noteInput}
+          />
 
           <Text style={styles.symptomsHeading}>Any symptoms today?</Text>
           <Text style={styles.symptomsSub}>Select all that apply</Text>
@@ -177,7 +180,8 @@ const styles = StyleSheet.create({
     ...textContrast,
   },
   noteInput: {
-    backgroundColor: 'transparent',
+    ...inputFieldStyle,
+    borderRadius: 16,
     padding: 16,
     minHeight: 80,
     fontSize: fontSizes.label,
@@ -185,7 +189,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     ...textContrast,
     textAlignVertical: 'top',
-    borderWidth: 0,
   },
   symptomsHeading: {
     fontSize: fontSizes.h3,

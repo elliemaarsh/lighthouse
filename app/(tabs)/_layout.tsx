@@ -6,9 +6,11 @@ import { colors } from '@/constants/theme';
 export default function TabLayout() {
   return (
     <Tabs
+      backBehavior="history"
       tabBar={(props) => <FloatingGlassTabBar {...props} />}
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: false,
         tabBarActiveTintColor: colors.textPrimary,
         tabBarInactiveTintColor: colors.textMuted,
         sceneStyle: {
@@ -16,11 +18,18 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: 'Home' }} />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Home',
+          tabBarLabel: 'Home',
+        }}
+      />
       <Tabs.Screen
         name="track"
         options={{
           title: 'Track',
+          tabBarLabel: 'Track',
           sceneStyle: { backgroundColor: colors.backgroundTransparent },
         }}
       />
@@ -28,11 +37,24 @@ export default function TabLayout() {
         name="connect"
         options={{
           title: 'Connect',
+          tabBarLabel: 'Connect',
           sceneStyle: { backgroundColor: colors.backgroundTransparent },
         }}
       />
-      <Tabs.Screen name="learn" options={{ title: 'Learn' }} />
-      <Tabs.Screen name="community" options={{ title: 'Forum' }} />
+      <Tabs.Screen
+        name="learn"
+        options={{
+          title: 'Learn',
+          tabBarLabel: 'Learn',
+        }}
+      />
+      <Tabs.Screen
+        name="community"
+        options={{
+          title: 'Community',
+          tabBarLabel: 'Community',
+        }}
+      />
     </Tabs>
   );
 }

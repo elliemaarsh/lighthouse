@@ -1,18 +1,21 @@
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { LayoutChangeEvent, Pressable, StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
+  type AnimatedStyle,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { GlassSurface } from '@/components/GlassSurface';
-import { useTabBarStore } from '@/store/useTabBarStore';
+import { AppBlurView } from '@/components/AppBlurView';
 import { TabIcon, type TabIconName } from '@/components/TabIcon';
-import { colors, fontSizes, fonts, radius, spacing } from '@/constants/theme';
+import { tabBarGlass } from '@/constants/glass';
+import { colors, radius, spacing } from '@/constants/theme';
 import { noFocusRing } from '@/lib/focusRing';
+import { useTabBarStore, type TabName } from '@/store/useTabBarStore';
 
 const TAB_ICONS: Record<string, TabIconName> = {
   index: 'home',
@@ -22,58 +25,47 @@ const TAB_ICONS: Record<string, TabIconName> = {
   community: 'community',
 };
 
-const TAB_ACTIVE_CONTENT = colors.textPrimary;
-const TAB_HOVER_CONTENT = colors.textPrimary;
-const TAB_HOVER_INACTIVE = colors.textSecondary;
-
-const PILL_HEIGHT = 56;
-const PILL_PAD_H = 12;
-const ROW_EDGE_INSET = 6;
-
+const BAR_HEIGHT = 58;
+const ICON_PILL_SIZE = 50;
+const ROW_EDGE_INSET = 8;
 const SPRING = { damping: 22, stiffness: 280, mass: 0.8 };
 
 type TabMetrics = {
   tabX: number;
   tabWidth: number;
-  contentWidth: number;
 };
 
-function tabPillGeometry(metrics: TabMetrics, containerWidth: number) {
-  const inset = (metrics.tabWidth - metrics.contentWidth) / 2;
-  let left = metrics.tabX + inset - PILL_PAD_H;
-  let width = metrics.contentWidth + PILL_PAD_H * 2;
-
-  if (containerWidth > 0) {
-    const maxRight = containerWidth - ROW_EDGE_INSET;
-    const minLeft = ROW_EDGE_INSET;
-    if (left + width > maxRight) {
-      left = maxRight - width;
-    }
-    if (left < minLeft) {
-      left = minLeft;
-    }
-    width = Math.min(width, containerWidth - minLeft * 2);
-  }
-
-  return { left, width };
+function pillLeftForTab(metrics: TabMetrics, containerWidth: number) {
+  const center = metrics.tabX + metrics.tabWidth / 2;
+  let left = center - ICON_PILL_SIZE / 2;
+  const minLeft = ROW_EDGE_INSET;
+  const maxLeft = containerWidth - ROW_EDGE_INSET - ICON_PILL_SIZE;
+  return Math.max(minLeft, Math.min(maxLeft, left));
 }
 
 type SlidingGlassPillProps = {
-  animatedStyle: ReturnType<typeof useAnimatedStyle>;
+  animatedStyle: AnimatedStyle<ViewStyle>;
 };
 
 function SlidingGlassPill({ animatedStyle }: SlidingGlassPillProps) {
   return (
     <Animated.View style={[styles.slidingPillOuter, animatedStyle]} pointerEvents="none">
-      <GlassSurface
-        variant="selected"
-        borderRadius={radius.pill}
-        shadow="soft"
-        style={styles.slidingPillGlass}
-      >
-        <View style={styles.slidingPillInner} />
-      </GlassSurface>
+      <View style={styles.slidingPillFill} />
     </Animated.View>
+  );
+}
+
+function TabBarGlassBackdrop() {
+  return (
+    <View style={styles.barBackdrop}>
+      <AppBlurView
+        blurType={tabBarGlass.blurType}
+        blurAmount={tabBarGlass.blurAmount}
+        style={StyleSheet.absoluteFill}
+        reducedTransparencyFallbackColor={tabBarGlass.fallback}
+      />
+      <View style={[StyleSheet.absoluteFill, styles.barFrost]} />
+    </View>
   );
 }
 
@@ -84,6 +76,7 @@ export function FloatingGlassTabBar({
 }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const hidden = useTabBarStore((s) => s.hidden);
+  const setLastTab = useTabBarStore((s) => s.setLastTab);
   const activeIndex = state.index;
   const slideY = useSharedValue(0);
 
@@ -93,15 +86,15 @@ export function FloatingGlassTabBar({
   const rowWidthRef = useRef(0);
 
   const pillLeft = useSharedValue(ROW_EDGE_INSET);
-  const pillWidth = useSharedValue(72);
+  const pillWidth = useSharedValue(ICON_PILL_SIZE);
 
   const applyPillPosition = useCallback(
     (index: number, map: Partial<Record<number, TabMetrics>>) => {
       const metrics = map[index];
       if (!metrics) return;
-      const { left, width } = tabPillGeometry(metrics, rowWidthRef.current);
+      const left = pillLeftForTab(metrics, rowWidthRef.current);
       pillLeft.value = withSpring(left, SPRING);
-      pillWidth.value = withSpring(width, SPRING);
+      pillWidth.value = withSpring(ICON_PILL_SIZE, SPRING);
     },
     [pillLeft, pillWidth],
   );
@@ -111,7 +104,7 @@ export function FloatingGlassTabBar({
   }, [activeIndex, metricsByIndex, applyPillPosition]);
 
   useEffect(() => {
-    const offscreen = PILL_HEIGHT + 36 + Math.max(insets.bottom, 12);
+    const offscreen = BAR_HEIGHT + 28 + Math.max(insets.bottom, 12);
     slideY.value = withSpring(hidden ? offscreen : 0, SPRING);
   }, [hidden, insets.bottom, slideY]);
 
@@ -124,29 +117,18 @@ export function FloatingGlassTabBar({
     width: pillWidth.value,
   }));
 
-  const updateMetrics = useCallback(
-    (index: number, partial: Partial<TabMetrics>) => {
+  const updateTabLayout = useCallback(
+    (index: number, layout: TabMetrics) => {
       setMetricsByIndex((prev) => {
-        const next = {
-          ...prev,
-          [index]: { ...prev[index], ...partial } as TabMetrics,
-        };
-        const m = next[index];
-        if (
-          m &&
-          m.tabWidth > 0 &&
-          m.contentWidth > 0 &&
-          typeof m.tabX === 'number' &&
-          index === activeIndex
-        ) {
-          const { left, width } = tabPillGeometry(m, rowWidthRef.current);
+        const next = { ...prev, [index]: layout };
+        if (index === activeIndex) {
+          const left = pillLeftForTab(layout, rowWidthRef.current);
           pillLeft.value = withSpring(left, SPRING);
-          pillWidth.value = withSpring(width, SPRING);
         }
         return next;
       });
     },
-    [activeIndex, pillLeft, pillWidth],
+    [activeIndex, pillLeft],
   );
 
   return (
@@ -159,14 +141,7 @@ export function FloatingGlassTabBar({
       pointerEvents={hidden ? 'none' : 'box-none'}
     >
       <View style={styles.barContainer}>
-        <GlassSurface
-          variant="card"
-          borderRadius={radius.pill}
-          shadow="card"
-          style={styles.barBackdrop}
-        >
-          <View style={styles.barBackdropFill} />
-        </GlassSurface>
+        <TabBarGlassBackdrop />
 
         <View
           style={styles.row}
@@ -183,10 +158,14 @@ export function FloatingGlassTabBar({
               options.tabBarLabel !== undefined
                 ? String(options.tabBarLabel)
                 : options.title !== undefined
-                  ? options.title
+                  ? String(options.title)
                   : route.name;
             const focused = activeIndex === index;
             const iconName = TAB_ICONS[route.name] ?? 'home';
+
+            const iconColor = focused
+              ? colors.buttonPrimaryText
+              : 'rgba(28, 24, 20, 0.42)';
 
             return (
               <Pressable
@@ -197,56 +176,51 @@ export function FloatingGlassTabBar({
                     target: route.key,
                     canPreventDefault: true,
                   });
-                  if (!focused && !event.defaultPrevented) {
-                    navigation.navigate(route.name, route.params);
+                  if (event.defaultPrevented) return;
+
+                  const currentTab = state.routes[activeIndex]?.name as TabName | undefined;
+
+                  if (focused) {
+                    // Re-tap: pop this tab's nested stack back to its root screen.
+                    if (route.name === 'index') {
+                      navigation.dispatch(
+                        CommonActions.navigate({
+                          name: 'index',
+                          merge: false,
+                        }),
+                      );
+                    } else {
+                      navigation.dispatch(
+                        CommonActions.navigate({
+                          name: route.name,
+                          params: { screen: 'index' },
+                          merge: false,
+                        }),
+                      );
+                    }
+                    return;
                   }
+
+                  if (currentTab && currentTab !== route.name) {
+                    setLastTab(currentTab);
+                  }
+
+                  navigation.navigate(route.name, route.params);
                 }}
                 onLayout={(e: LayoutChangeEvent) => {
                   const { x, width } = e.nativeEvent.layout;
-                  updateMetrics(index, { tabX: x, tabWidth: width });
+                  updateTabLayout(index, { tabX: x, tabWidth: width });
                 }}
                 style={[styles.tab, noFocusRing]}
                 accessibilityRole="button"
                 accessibilityState={focused ? { selected: true } : {}}
                 accessibilityLabel={label}
               >
-                {({ hovered }) => {
-                  const contentColor = hovered
-                    ? focused
-                      ? TAB_HOVER_CONTENT
-                      : TAB_HOVER_INACTIVE
-                    : focused
-                      ? TAB_ACTIVE_CONTENT
-                      : colors.textMuted;
-
-                  return (
-                    <View
-                      style={styles.tabContent}
-                      onLayout={(e: LayoutChangeEvent) => {
-                        const { width } = e.nativeEvent.layout;
-                        updateMetrics(index, { contentWidth: width });
-                      }}
-                    >
-                      <TabIcon
-                        name={iconName}
-                        color={contentColor}
-                        focused={focused}
-                        hovered={hovered}
-                      />
-                      <Text
-                        style={[
-                          styles.label,
-                          { color: contentColor },
-                          focused && styles.labelActive,
-                          hovered && styles.labelHover,
-                        ]}
-                        numberOfLines={1}
-                      >
-                        {label}
-                      </Text>
-                    </View>
-                  );
-                }}
+                <TabIcon
+                  name={iconName}
+                  color={iconColor}
+                  focused={focused}
+                />
               </Pressable>
             );
           })}
@@ -267,61 +241,50 @@ const styles = StyleSheet.create({
     width: '100%',
     position: 'relative',
     overflow: 'visible',
+    borderRadius: radius.pill,
+    borderWidth: 0,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 6,
   },
   barBackdrop: {
     ...StyleSheet.absoluteFillObject,
+    overflow: 'hidden',
+    borderRadius: radius.pill,
   },
-  barBackdropFill: {
-    minHeight: PILL_HEIGHT + 16,
+  barFrost: {
+    backgroundColor: tabBarGlass.frost,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 4,
     paddingHorizontal: ROW_EDGE_INSET,
-    minHeight: PILL_HEIGHT + 16,
+    minHeight: BAR_HEIGHT,
     position: 'relative',
     zIndex: 1,
   },
   slidingPillOuter: {
     position: 'absolute',
     left: 0,
-    top: 8,
-    height: PILL_HEIGHT,
+    top: 4,
+    height: ICON_PILL_SIZE,
     overflow: 'hidden',
-    borderRadius: radius.pill,
+    borderRadius: ICON_PILL_SIZE / 2,
   },
-  slidingPillGlass: {
-    width: '100%',
-    height: '100%',
-  },
-  slidingPillInner: {
-    width: '100%',
-    height: PILL_HEIGHT,
+  slidingPillFill: {
+    flex: 1,
+    borderRadius: ICON_PILL_SIZE / 2,
+    backgroundColor: tabBarGlass.selectedFill,
+    borderWidth: 0,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: PILL_HEIGHT,
+    height: ICON_PILL_SIZE,
     zIndex: 2,
-  },
-  tabContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 2,
-    paddingVertical: 6,
-  },
-  label: {
-    fontSize: fontSizes.tabLabel,
-    fontFamily: fonts.medium,
-    letterSpacing: 0.35,
-    marginTop: 2,
-  },
-  labelActive: {
-    fontFamily: fonts.semiBold,
-  },
-  labelHover: {
-    opacity: 1,
   },
 });

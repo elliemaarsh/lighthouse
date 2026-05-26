@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from '@react-native-community/blur';
 import { router, type Href } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { GlassSurface } from '@/components/GlassSurface';
 import { routes } from '@/constants/routes';
 import { colors, fonts } from '@/constants/theme';
 import { timeAgo } from '@/lib/timeAgo';
@@ -24,17 +24,7 @@ export function PostCard({ post, markedHelpful = false }: PostCardProps) {
 
   return (
     <Pressable onPress={open} style={[styles.wrap, noFocusRing]}>
-      <View style={styles.glassShell}>
-        {Platform.OS === 'web' ? (
-          <View style={[StyleSheet.absoluteFill, styles.glassFallback]} />
-        ) : (
-          <BlurView
-            blurType="light"
-            blurAmount={16}
-            style={StyleSheet.absoluteFill}
-            reducedTransparencyFallbackColor="rgba(255,255,255,0.55)"
-          />
-        )}
+      <GlassSurface variant="card" borderRadius={20} shadow="soft" style={styles.shell}>
         <View style={styles.content}>
           <View style={styles.topRow}>
             <Text style={styles.username}>@{post.username}</Text>
@@ -78,7 +68,7 @@ export function PostCard({ post, markedHelpful = false }: PostCardProps) {
             </View>
           </View>
         </View>
-      </View>
+      </GlassSurface>
     </Pressable>
   );
 }
@@ -87,14 +77,8 @@ const styles = StyleSheet.create({
   wrap: {
     marginBottom: 12,
   },
-  glassShell: {
-    borderRadius: 20,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  glassFallback: {
-    backgroundColor: 'rgba(255,255,255,0.55)',
+  shell: {
+    width: '100%',
   },
   content: {
     padding: 20,
@@ -138,7 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: fonts.regular,
     color: colors.textSecondary,
-    backgroundColor: 'rgba(26, 36, 34, 0.06)',
+    backgroundColor: 'rgba(255,255,255,0.1)',
     borderRadius: 100,
     paddingVertical: 3,
     paddingHorizontal: 10,

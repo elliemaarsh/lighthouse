@@ -9,6 +9,7 @@ import {
   parseBirthDateParts,
 } from '@/app/onboarding/lib/birthDate';
 import { onboardingTheme } from '@/app/onboarding/theme';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { fontSizes, fonts } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';
 
@@ -118,15 +119,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   input: {
-    backgroundColor: onboardingTheme.inputBg,
+    ...inputFieldStyle,
     borderRadius: 100,
     paddingVertical: 14,
     paddingHorizontal: 12,
     fontSize: fontSizes.body,
     fontFamily: fonts.medium,
     color: onboardingTheme.textPrimary,
-    borderWidth: 1,
-    borderColor: onboardingTheme.cardBorder,
   },
   hint: {
     fontSize: 12,

@@ -1,18 +1,14 @@
 import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
-import { BlurView } from '@react-native-community/blur';
 import { forwardRef, useEffect, useMemo, useState } from 'react';
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+
+import { AppBlurView } from '@/components/AppBlurView';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { APPOINTMENT_TYPES } from '@/constants/connect';
 import { glass } from '@/constants/glass';
+import { BUTTON_OPTION_SELECTED } from '@/constants/buttons';
+import { inputFieldStyle } from '@/constants/surfaces';
 import { colors, connectDashboard, fontSizes, fonts } from '@/constants/theme';
 import type { Appointment, AppointmentType } from '@/types/connect';
 
@@ -22,15 +18,8 @@ type AppointmentSheetProps = {
 };
 
 function SheetBackground() {
-  if (Platform.OS === 'web') {
-    return (
-      <View
-        style={[StyleSheet.absoluteFill, { backgroundColor: colors.backgroundTransparent }]}
-      />
-    );
-  }
   return (
-    <BlurView
+    <AppBlurView
       style={StyleSheet.absoluteFill}
       blurType="light"
       blurAmount={24}
@@ -204,7 +193,7 @@ const styles = StyleSheet.create({
     marginTop: 12,
   },
   input: {
-    backgroundColor: connectDashboard.inputBg,
+    ...inputFieldStyle,
     borderRadius: 100,
     paddingVertical: 14,
     paddingHorizontal: 18,
@@ -231,7 +220,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   timeInput: {
-    backgroundColor: connectDashboard.inputBg,
+    ...inputFieldStyle,
     borderRadius: 16,
     paddingVertical: 12,
     paddingHorizontal: 14,
@@ -249,13 +238,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 100,
-    backgroundColor: colors.cardUnselectedBg,
-    borderWidth: 1,
-    borderColor: connectDashboard.cardBorder,
+    backgroundColor: '#FFFFFF',
+    borderWidth: inputFieldStyle.borderWidth,
+    borderColor: inputFieldStyle.borderColor,
   },
   typePillOn: {
-    backgroundColor: colors.cardSelectedBg,
-    borderColor: colors.cardSelectedBorder,
+    ...BUTTON_OPTION_SELECTED.container,
   },
   typeText: {
     fontSize: fontSizes.label,
@@ -263,7 +251,7 @@ const styles = StyleSheet.create({
     color: connectDashboard.textPrimary,
   },
   typeTextOn: {
-    color: connectDashboard.buttonText,
+    ...BUTTON_OPTION_SELECTED.label,
   },
   notes: {
     borderRadius: 20,
