@@ -1,3 +1,4 @@
+import { DEFAULT_PARTNER_DAILY_STREAK } from '@/constants/partner';
 import { fetchLocalPartnerStreak } from '@/lib/checkInStorage';
 import { ensureLocalUserId } from '@/lib/localUserId';
 import { supabase } from '@/lib/supabase';
@@ -15,7 +16,7 @@ export async function fetchPartnerStreak(userId: string | null): Promise<number>
     .limit(60);
 
   if (error || !data?.length) {
-    return localStreak;
+    return Math.max(localStreak, DEFAULT_PARTNER_DAILY_STREAK);
   }
 
   const dates = new Set(data.map((row) => row.date as string));
@@ -30,5 +31,5 @@ export async function fetchPartnerStreak(userId: string | null): Promise<number>
     cursor.setDate(cursor.getDate() - 1);
   }
 
-  return Math.max(streak, localStreak);
+  return Math.max(streak, localStreak, DEFAULT_PARTNER_DAILY_STREAK);
 }

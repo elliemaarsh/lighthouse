@@ -5,7 +5,7 @@ import { GlassChip } from '@/components/GlassChip';
 import { DialRulerPicker } from '@/components/ui/DialRulerPicker';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { EXERCISE_TYPES } from '@/constants/partner';
-import { colors, fontSizes, fonts, textContrast } from '@/constants/theme';
+import { partnerSheetTypography } from '@/constants/partnerSheet';
 import type { PartnerLogData } from '@/types/partnerLog';
 
 const MINUTE_VALUES = Array.from({ length: 25 }, (_, i) => (i + 1) * 5);
@@ -42,6 +42,7 @@ export function ExerciseSheetContent({ log, onSave }: ExerciseSheetContentProps)
         onChange={setMinutes}
         unitLabel="minutes"
         defaultValue={30}
+        palette="mist"
       />
       <Text style={styles.sectionLabel}>Activity</Text>
       <View style={styles.chips}>
@@ -61,14 +62,9 @@ export function ExerciseSheetContent({ log, onSave }: ExerciseSheetContentProps)
 
 const styles = StyleSheet.create({
   sectionLabel: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textOnDarkFaint,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
+    ...partnerSheetTypography.sectionLabel,
     marginTop: 8,
     marginBottom: 12,
-    ...textContrast,
   },
   chips: {
     flexDirection: 'row',

@@ -8,14 +8,9 @@ import { saveUserProfileToSupabase } from '@/app/onboarding/lib/saveUserProfile'
 import { onboardingTheme } from '@/app/onboarding/theme';
 import { inputFieldStyle } from '@/constants/surfaces';
 import { fontSizes, fonts } from '@/constants/theme';
+import { finishOnboarding } from '@/lib/finishOnboarding';
 import { partnerFirstName } from '@/lib/partnerDisplay';
 import { useUserStore } from '@/store/useUserStore';
-
-function finishOnboarding() {
-  const { completeOnboarding } = useUserStore.getState();
-  completeOnboarding();
-  router.replace('/(tabs)');
-}
 
 export default function InviteScreen() {
   const storedEmail = useUserStore((s) => s.partnerEmail);

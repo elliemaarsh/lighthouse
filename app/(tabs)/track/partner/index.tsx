@@ -21,6 +21,7 @@
 
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { useFocusEffect } from '@react-navigation/native';
+import { router } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView, ScrollView } from 'react-native-gesture-handler';
@@ -32,8 +33,16 @@ import { PartnerDailyStreakCard } from '@/components/partner/PartnerDailyStreakC
 import { PartnerTipCard } from '@/components/partner/PartnerTipCard';
 import { PartnerTrainingCard } from '@/components/partner/PartnerTrainingCard';
 import { PartnerLogSheet } from '@/components/partner/sheets/PartnerLogSheet';
+import { PartnerTodaySummarySection } from '@/components/track/partner/PartnerTodaySummarySection';
+import { PartnerWeekTrendsSection } from '@/components/track/partner/PartnerWeekTrendsSection';
+import { DEFAULT_PARTNER_DAILY_STREAK } from '@/constants/partner';
+import { seedPartnerLogsIfEmpty } from '@/data/seedPartnerLogs';
 import {
-  countLoggedCategories,
+  countLoggedFromTodayLog,
+  hasAnyPartnerLogToday,
+  todayLogToPartnerData,
+} from '@/lib/partnerLogMappers';
+import {
   formatHeatValue,
   formatNotesValue,
   formatSleepValue,
@@ -42,64 +51,81 @@ import {
   isCategoryLogged,
 } from '@/lib/partnerDisplay';
 import { ensureLocalUserId } from '@/lib/localUserId';
+import { loadPartnerWeeklyLogs } from '@/lib/partnerWeek';
 import { partnerLogSession } from '@/lib/partnerLogSession';
 import { savePartnerLog } from '@/lib/partnerLogs';
 import { fetchPartnerStreak } from '@/lib/partnerStreak';
-import {
-  colors,
-  fonts,
-  spacing,
-  textContrast,
-  typography,
-} from '@/constants/theme';
+import { colors, fonts, spacing, textContrast, typography } from '@/constants/theme';
 import type { PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
 import { useStoreHydrated } from '@/hooks/useStoreHydrated';
 import { useTabBarScrollPadding } from '@/hooks/useTabBarScrollPadding';
+import { usePartnerLogStore } from '@/store/usePartnerLogStore';
 import { useTabBarStore } from '@/store/useTabBarStore';
 import { useUserStore } from '@/store/useUserStore';
 
 const TOTAL_CATEGORIES = 6;
+const PROGRESS_FILL = '#EDE290';
 
 /** One grid row (card height + gap) so last row clears the tab bar */
 const PARTNER_GRID_ROW_EXTRA = 152;
 
 export default function PartnerTrackScreen() {
   const storeReady = useStoreHydrated();
+  const role = useUserStore((s) => s.role);
   const userId = useUserStore((s) => s.userId);
+  const todayLog = usePartnerLogStore((s) => s.todayLog);
+  const weeklyLogs = usePartnerLogStore((s) => s.weeklyLogs);
   const scrollBottomPad = useTabBarScrollPadding({ extra: PARTNER_GRID_ROW_EXTRA });
   const setTabBarHidden = useTabBarStore((s) => s.setHidden);
   const [log, setLog] = useState<PartnerLogData>(() => partnerLogSession.getToday());
-  const [streak, setStreak] = useState(0);
+  const [streak, setStreak] = useState(DEFAULT_PARTNER_DAILY_STREAK);
   const [activeCategory, setActiveCategory] = useState<PartnerCategoryId | null>(null);
   const sheetRef = useRef<BottomSheetModal>(null);
 
-  const loadToday = useCallback(async () => {
+  const displayLog = todayLog ? todayLogToPartnerData(todayLog) : log;
+  const loggedCount = countLoggedFromTodayLog(todayLog);
+  const progress = loggedCount / TOTAL_CATEGORIES;
+  const showSummary = hasAnyPartnerLogToday(todayLog);
+  const showCategoryGrid = loggedCount < TOTAL_CATEGORIES;
+
+  const loadPartnerData = useCallback(async () => {
     if (!storeReady) return;
     const uid = userId || ensureLocalUserId();
     if (!uid) return;
 
-    const [todayLog, streakDays] = await Promise.all([
+    usePartnerLogStore.getState().resetIfNewDay();
+
+    await seedPartnerLogsIfEmpty(uid);
+
+    const [today, streakDays, week] = await Promise.all([
       partnerLogSession.hydrate(uid),
       fetchPartnerStreak(uid),
+      loadPartnerWeeklyLogs(uid),
     ]);
-    setLog(todayLog);
+
+    setLog(today);
+    usePartnerLogStore.getState().syncFromPartnerData(today, { keepLoggedAt: true });
+    usePartnerLogStore.getState().setWeeklyLogs(week);
     setStreak(streakDays);
+
   }, [storeReady, userId]);
 
   useFocusEffect(
     useCallback(() => {
       if (!storeReady) return;
-      void loadToday();
+      if (role != null && role !== 'non-carrying') {
+        router.replace('/(tabs)/track');
+        return;
+      }
+      void loadPartnerData();
       setTabBarHidden(false);
       return () => setTabBarHidden(false);
-    }, [loadToday, setTabBarHidden, storeReady]),
+    }, [loadPartnerData, role, setTabBarHidden, storeReady]),
   );
 
-  const loggedCount = countLoggedCategories(log);
-  const progress = loggedCount / TOTAL_CATEGORIES;
-  const heat = formatHeatValue(log);
-  const substances = formatSubstancesValue(log);
-  const trainingOn = log.exerciseActive === true;
+  const heat = formatHeatValue(displayLog);
+  const substances = formatSubstancesValue(displayLog);
+  const trainingOn = displayLog.exerciseActive === true;
 
   const openCategory = (id: PartnerCategoryId) => {
     setActiveCategory(id);
@@ -112,6 +138,11 @@ export default function PartnerTrackScreen() {
     setTabBarHidden(false);
   };
 
+  const refreshWeekly = async (uid: string) => {
+    const week = await loadPartnerWeeklyLogs(uid);
+    usePartnerLogStore.getState().setWeeklyLogs(week);
+  };
+
   const handleSaveCategory = async (patch: Partial<PartnerLogData>) => {
     if (!storeReady) return;
     const uid = userId || ensureLocalUserId();
@@ -121,6 +152,10 @@ export default function PartnerTrackScreen() {
     partnerLogSession.setToday(next);
     setLog(next);
     await savePartnerLog(uid, next);
+
+    usePartnerLogStore.getState().syncFromPartnerData(next);
+
+    await refreshWeekly(uid);
     const streakDays = await fetchPartnerStreak(uid);
     setStreak(streakDays);
   };
@@ -148,45 +183,56 @@ export default function PartnerTrackScreen() {
           nestedScrollEnabled
           bounces
         >
-            <View style={styles.header}>
-              <Text style={styles.todayLabel}>TODAY</Text>
-              <Text style={styles.headline}>Your health log</Text>
-            </View>
+          <View style={styles.header}>
+            <Text style={styles.todayLabel}>TODAY</Text>
+            <Text style={styles.headline}>Your health log</Text>
+          </View>
 
-            <View style={styles.progressTrack}>
-              <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
-            </View>
-            <Text style={styles.progressLabel}>
-              {loggedCount} of {TOTAL_CATEGORIES} logged today
-            </Text>
+          <View style={styles.progressTrack}>
+            <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+          </View>
+          <Text style={styles.progressLabel}>
+            {loggedCount} of {TOTAL_CATEGORIES} logged today
+          </Text>
 
-            <View style={styles.heroRow}>
-              <PartnerDailyStreakCard streak={streak} />
-              <PartnerTrainingCard
-                trainingOn={trainingOn}
-                onToggle={handleTrainingToggle}
-                onOpenDetails={() => openCategory('exercise')}
-              />
-            </View>
+          <View style={styles.heroRow}>
+            <PartnerDailyStreakCard streak={streak} />
+            <PartnerTrainingCard
+              trainingOn={trainingOn}
+              onToggle={handleTrainingToggle}
+              onOpenDetails={() => openCategory('exercise')}
+            />
+          </View>
 
-            <View style={styles.tipWrap}>
-              <PartnerTipCard />
-            </View>
+          <View style={styles.tipWrap}>
+            <PartnerTipCard />
+          </View>
 
+          {showSummary && todayLog ? (
+            <PartnerTodaySummarySection
+              todayLog={todayLog}
+              onOpenCategory={openCategory}
+              onEdit={() => openCategory('sleep')}
+            />
+          ) : null}
+
+          <PartnerWeekTrendsSection weeklyLogs={weeklyLogs} todayLog={todayLog} />
+
+          {showCategoryGrid ? (
             <View style={styles.grid}>
               <PartnerCategoryCard
                 category="sleep"
-                value={formatSleepValue(log)}
+                value={formatSleepValue(displayLog)}
                 valueSize={28}
                 valueFont="light"
-                logged={isCategoryLogged('sleep', log)}
+                logged={isCategoryLogged('sleep', displayLog)}
                 onPress={() => openCategory('sleep')}
               />
               <PartnerCategoryCard
                 category="heat"
                 value={heat.text}
                 valueColor={heat.color}
-                logged={isCategoryLogged('heat', log)}
+                logged={isCategoryLogged('heat', displayLog)}
                 onPress={() => openCategory('heat')}
               />
               <PartnerCategoryCard
@@ -194,28 +240,29 @@ export default function PartnerTrackScreen() {
                 value={substances.text}
                 valueColor={substances.color}
                 valueSize={15}
-                logged={isCategoryLogged('substances', log)}
+                logged={isCategoryLogged('substances', displayLog)}
                 onPress={() => openCategory('substances')}
               />
               <PartnerCategoryCard
                 category="stress"
-                value={formatStressValue(log)}
-                logged={isCategoryLogged('stress', log)}
+                value={formatStressValue(displayLog)}
+                logged={isCategoryLogged('stress', displayLog)}
                 onPress={() => openCategory('stress')}
               />
               <PartnerCategoryCard
                 category="notes"
-                value={formatNotesValue(log)}
+                value={formatNotesValue(displayLog)}
                 valueSize={13}
                 valueFont="regular"
-                logged={isCategoryLogged('notes', log)}
+                logged={isCategoryLogged('notes', displayLog)}
                 onPress={() => openCategory('notes')}
               />
             </View>
+          ) : null}
 
-            <View style={styles.exportWrap}>
-              <MedicalExportCard />
-            </View>
+          <View style={styles.exportWrap}>
+            <MedicalExportCard />
+          </View>
         </ScrollView>
       </SafeAreaView>
 
@@ -223,7 +270,7 @@ export default function PartnerTrackScreen() {
         <PartnerLogSheet
           ref={sheetRef}
           category={activeCategory}
-          log={log}
+          log={displayLog}
           onSaveCategory={handleSaveCategory}
           onDismiss={closeSheet}
         />
@@ -270,14 +317,14 @@ const styles = StyleSheet.create({
   progressTrack: {
     height: 3,
     borderRadius: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.18)',
+    backgroundColor: 'rgba(26, 36, 34, 0.08)',
     marginHorizontal: spacing.lg,
     overflow: 'hidden',
   },
   progressFill: {
     height: 3,
     borderRadius: 100,
-    backgroundColor: colors.accentLime,
+    backgroundColor: PROGRESS_FILL,
   },
   progressLabel: {
     fontSize: 12,
@@ -303,6 +350,7 @@ const styles = StyleSheet.create({
     gap: 12,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.md,
+    marginTop: 4,
   },
   exportWrap: {
     paddingHorizontal: spacing.lg,

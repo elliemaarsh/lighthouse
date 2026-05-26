@@ -10,6 +10,7 @@ import {
 import { OnboardingGlassCard } from '@/app/onboarding/components/OnboardingGlassCard';
 import { OnboardingOptionList } from '@/app/onboarding/components/OnboardingOptionList';
 import { OnboardingShell } from '@/app/onboarding/components/OnboardingShell';
+import { onboardingTheme } from '@/app/onboarding/theme';
 import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
 import { fontSizes, fonts } from '@/constants/theme';
 import { useUserStore } from '@/store/useUserStore';

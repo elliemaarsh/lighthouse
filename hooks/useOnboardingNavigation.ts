@@ -1,12 +1,15 @@
 import { useRootNavigationState, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
 
-import { routes } from '@/constants/routes';
 import { isClient } from '@/lib/storage';
 import { useUserStore } from '@/store/useUserStore';
 
 function isOnboardingRoute(root: string | undefined) {
-  return root === undefined || root === 'onboarding';
+  return root === 'onboarding';
+}
+
+function goToMainApp(router: ReturnType<typeof useRouter>) {
+  router.dismissTo('/(tabs)');
 }
 
 /**
@@ -52,7 +55,7 @@ export function useOnboardingNavigation() {
     const inTabs = root === '(tabs)';
 
     if (hasCompletedOnboarding && inOnboarding) {
-      router.replace(routes.home);
+      goToMainApp(router);
       return;
     }
 

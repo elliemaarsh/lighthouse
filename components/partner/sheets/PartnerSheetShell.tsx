@@ -1,10 +1,9 @@
 import type { ReactNode } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { PillButton } from '@/components/onboarding/PillButton';
-import { OnboardingTypography } from '@/components/onboarding/OnboardingTypography';
-import { glass } from '@/constants/glass';
+import { AppButton } from '@/components/ui/AppButton';
+import { partnerSheet, partnerSheetTypography } from '@/constants/partnerSheet';
 
 type PartnerSheetShellProps = {
   title: string;
@@ -24,15 +23,13 @@ export function PartnerSheetShell({
   return (
     <View style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, 16) }]}>
       <View style={styles.handle} />
-      <OnboardingTypography variant="headlineRole" style={styles.title}>
-        {title}
-      </OnboardingTypography>
+      <Text style={styles.title}>{title}</Text>
       <View style={styles.body}>{children}</View>
-      <PillButton
+      <AppButton
         label="Save"
         onPress={onSave}
+        tier={2}
         disabled={saveDisabled}
-        variant="glass"
         style={styles.saveBtn}
       />
     </View>
@@ -44,18 +41,18 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 24,
     paddingTop: 8,
+    backgroundColor: partnerSheet.background,
   },
   handle: {
     alignSelf: 'center',
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: glass.lineStrong,
+    backgroundColor: partnerSheet.handle,
     marginBottom: 20,
   },
   title: {
-    fontSize: 22,
-    lineHeight: 28,
+    ...partnerSheetTypography.title,
     marginBottom: 16,
   },
   body: {

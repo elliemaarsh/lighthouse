@@ -1,8 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { BUTTON_OPTION_SELECTED, BUTTON_OPTION_UNSELECTED } from '@/constants/buttons';
+import { partnerSheet } from '@/constants/partnerSheet';
 import { noFocusRing } from '@/lib/focusRing';
-import { fontSizes, fonts, partnerDashboard, radius } from '@/constants/theme';
+import { fontSizes, fonts, radius } from '@/constants/theme';
 
 type GlassChipProps = {
   label: string;
@@ -51,17 +52,13 @@ export function GlassChip({ label, selected, onPress, tone = 'default' }: GlassC
         <View
           style={[
             styles.partnerChip,
-            selected
-              ? [BUTTON_OPTION_SELECTED.container, styles.partnerChipSelected]
-              : [BUTTON_OPTION_UNSELECTED.container, styles.partnerChipIdle],
+            selected ? styles.partnerChipSelected : styles.partnerChipIdle,
           ]}
         >
           <Text
             style={[
               styles.partnerLabel,
-              selected
-                ? BUTTON_OPTION_SELECTED.label
-                : [BUTTON_OPTION_UNSELECTED.label, styles.partnerLabelIdle],
+              selected ? styles.partnerLabelSelected : styles.partnerLabelIdle,
             ]}
           >
             {label}
@@ -91,13 +88,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     borderRadius: radius.pill,
   },
-  partnerChipIdle: {},
-  partnerChipSelected: {},
+  partnerChipIdle: {
+    backgroundColor: partnerSheet.unselectedBg,
+    borderWidth: 0.5,
+    borderColor: partnerSheet.unselectedBorder,
+  },
+  partnerChipSelected: {
+    backgroundColor: partnerSheet.selectedBg,
+    borderWidth: 0.5,
+    borderColor: partnerSheet.selectedBorder,
+  },
   partnerLabel: {
     fontSize: fontSizes.label,
+    fontFamily: fonts.light,
     letterSpacing: 0.2,
   },
   partnerLabelIdle: {
-    color: partnerDashboard.textPrimary,
+    color: partnerSheet.unselectedText,
+  },
+  partnerLabelSelected: {
+    color: partnerSheet.selectedText,
   },
 });

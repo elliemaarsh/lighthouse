@@ -3,6 +3,10 @@ import { Tabs } from 'expo-router';
 import { FloatingGlassTabBar } from '@/components/FloatingGlassTabBar';
 import { colors } from '@/constants/theme';
 
+export const unstable_settings = {
+  initialRouteName: 'index',
+};
+
 export default function TabLayout() {
   return (
     <Tabs

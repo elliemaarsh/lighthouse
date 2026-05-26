@@ -12,6 +12,7 @@ import { FlowerBackground } from '@/components/FlowerBackground';
 import { colors } from '@/constants/theme';
 import { useOnboardingNavigation } from '@/hooks/useOnboardingNavigation';
 import { ensureLocalUserId } from '@/lib/localUserId';
+import { usePartnerLogStore } from '@/store/usePartnerLogStore';
 import { useTrackStore } from '@/store/useTrackStore';
 
 export { ErrorBoundary } from 'expo-router';
@@ -35,6 +36,7 @@ export default function RootLayout() {
   useEffect(() => {
     ensureLocalUserId();
     useTrackStore.getState().resetIfNewDay();
+    usePartnerLogStore.getState().resetIfNewDay();
   }, []);
 
   useEffect(() => {

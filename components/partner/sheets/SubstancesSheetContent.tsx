@@ -2,10 +2,9 @@ import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { GlassChip } from '@/components/GlassChip';
-import { GlassSurface } from '@/components/GlassSurface';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { SUBSTANCE_OPTIONS } from '@/constants/partner';
-import { colors, fontSizes, fonts, radius, textContrast, typography } from '@/constants/theme';
+import { partnerSheet, partnerSheetTypography } from '@/constants/partnerSheet';
 import type { PartnerLogData } from '@/types/partnerLog';
 
 const NONE = 'None';
@@ -65,16 +64,20 @@ export function SubstancesSheetContent({ log, onSave }: SubstancesSheetContentPr
         <View style={styles.stepperRow}>
           <Text style={styles.stepperLabel}>Drinks today</Text>
           <View style={styles.stepper}>
-            <Pressable onPress={() => setDrinks((d) => Math.max(0, d - 1))} style={styles.stepBtn}>
-              <GlassSurface variant="pill" borderRadius={radius.avatar} shadow="none">
-                <Text style={styles.stepBtnText}>−</Text>
-              </GlassSurface>
+            <Pressable
+              onPress={() => setDrinks((d) => Math.max(0, d - 1))}
+              style={styles.stepBtn}
+              accessibilityLabel="Decrease drinks"
+            >
+              <Text style={styles.stepBtnText}>−</Text>
             </Pressable>
             <Text style={styles.stepValue}>{drinks}</Text>
-            <Pressable onPress={() => setDrinks((d) => d + 1)} style={styles.stepBtn}>
-              <GlassSurface variant="pill" borderRadius={radius.avatar} shadow="none">
-                <Text style={styles.stepBtnText}>+</Text>
-              </GlassSurface>
+            <Pressable
+              onPress={() => setDrinks((d) => d + 1)}
+              style={styles.stepBtn}
+              accessibilityLabel="Increase drinks"
+            >
+              <Text style={styles.stepBtnText}>+</Text>
             </Pressable>
           </View>
         </View>
@@ -85,12 +88,8 @@ export function SubstancesSheetContent({ log, onSave }: SubstancesSheetContentPr
 
 const styles = StyleSheet.create({
   hint: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkFaint,
+    ...partnerSheetTypography.subtext,
     marginBottom: 16,
-    lineHeight: 18,
-    ...textContrast,
   },
   grid: {
     flexDirection: 'row',
@@ -102,11 +101,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   stepperLabel: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.medium,
-    color: colors.textOnDarkFaint,
+    ...partnerSheetTypography.subtext,
     marginBottom: 12,
-    ...textContrast,
   },
   stepper: {
     flexDirection: 'row',
@@ -114,25 +110,21 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   stepBtn: {
-    borderRadius: radius.avatar,
-    overflow: 'hidden',
-  },
-  stepBtnText: {
     width: 44,
     height: 44,
-    lineHeight: 44,
-    textAlign: 'center',
-    fontSize: 24,
-    fontFamily: fonts.regular,
-    color: colors.textOnDark,
-    ...textContrast,
+    borderRadius: 22,
+    borderWidth: 0.5,
+    borderColor: partnerSheet.stepperBorderColor,
+    backgroundColor: partnerSheet.unselectedBg,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  stepBtnText: {
+    ...partnerSheetTypography.stepperBtn,
   },
   stepValue: {
-    fontSize: 28,
-    fontFamily: typography.display.fontFamily,
-    color: colors.textOnDark,
+    ...partnerSheetTypography.stepperValue,
     minWidth: 32,
     textAlign: 'center',
-    ...textContrast,
   },
 });

@@ -53,6 +53,7 @@ export function SleepSheetContent({ log, onSave }: SleepSheetContentProps) {
         onChange={setHours}
         unitLabel="hours"
         defaultValue={8}
+        palette="mist"
       />
       <View style={styles.quickRow}>
         {SLEEP_QUICK_HOURS.map((h) => (

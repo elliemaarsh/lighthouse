@@ -1,5 +1,8 @@
 import type { PartnerCategoryId } from '@/types/partnerLog';
 
+/** Shown on Track + home widgets until a longer computed streak exists. */
+export const DEFAULT_PARTNER_DAILY_STREAK = 19;
+
 export const PARTNER_CATEGORIES: PartnerCategoryId[] = [
   'sleep',
   'exercise',

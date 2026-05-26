@@ -4,7 +4,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { GlassStopSlider } from '@/components/ui/GlassStopSlider';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { STRESS_LEVELS } from '@/constants/partner';
-import { colors, fontSizes, fonts, textContrast, typography } from '@/constants/theme';
+import { partnerSheet, partnerSheetTypography } from '@/constants/partnerSheet';
+import { fonts } from '@/constants/theme';
 import type { PartnerLogData } from '@/types/partnerLog';
 
 type StressSheetContentProps = {
@@ -51,6 +52,7 @@ export function StressSheetContent({ log, onSave }: StressSheetContentProps) {
         value={level}
         onChange={setLevel}
         leftLabel="Stress"
+        palette="mist"
         formatDisplay={(v, stop) => `${v} — ${stop.label}`}
       />
     </PartnerSheetShell>
@@ -59,12 +61,9 @@ export function StressSheetContent({ log, onSave }: StressSheetContentProps) {
 
 const styles = StyleSheet.create({
   prompt: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkFaint,
+    ...partnerSheetTypography.subtext,
     textAlign: 'center',
     marginBottom: 20,
-    ...textContrast,
   },
   readout: {
     alignItems: 'center',
@@ -72,26 +71,18 @@ const styles = StyleSheet.create({
   },
   readoutNum: {
     fontSize: 56,
-    fontFamily: typography.display.fontFamily,
-    color: colors.textOnDark,
+    fontFamily: fonts.extraLight,
+    color: partnerSheet.titleColor,
     letterSpacing: 2,
-    ...textContrast,
   },
   readoutLabel: {
-    fontSize: fontSizes.h3,
-    fontFamily: fonts.semiBold,
-    color: colors.textOnDark,
+    ...partnerSheetTypography.label,
     marginTop: 4,
-    ...textContrast,
   },
   readoutDesc: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkMuted,
+    ...partnerSheetTypography.subtext,
     marginTop: 6,
     textAlign: 'center',
-    lineHeight: 20,
     paddingHorizontal: 16,
-    ...textContrast,
   },
 });

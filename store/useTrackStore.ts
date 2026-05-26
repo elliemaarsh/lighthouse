@@ -21,11 +21,21 @@ export type TodayLog = {
   loggedAt: string | null;
 };
 
+export type WeeklyLogEntry = {
+  date: string;
+  mood: number | null;
+  temperature: number | null;
+  symptoms: string[];
+  periodStatus: CheckInData['periodStatus'] | string | null;
+};
+
 type TrackState = {
   hasLoggedToday: boolean;
   todayLog: TodayLog | null;
+  weeklyLogs: WeeklyLogEntry[];
   setTodayCheckIn: (data: CheckInData) => void;
   clearTodayCheckIn: () => void;
+  setWeeklyLogs: (logs: WeeklyLogEntry[]) => void;
   resetIfNewDay: () => void;
   hydrateFromRemote: (userId: string | null) => Promise<void>;
 };
@@ -70,6 +80,7 @@ export const useTrackStore = create<TrackState>()(
     (set, get) => ({
       hasLoggedToday: false,
       todayLog: null,
+      weeklyLogs: [],
 
       setTodayCheckIn: (data) => {
         const loggedAt = new Date().toISOString();
@@ -80,6 +91,8 @@ export const useTrackStore = create<TrackState>()(
       clearTodayCheckIn: () => {
         set({ hasLoggedToday: false, todayLog: null });
       },
+
+      setWeeklyLogs: (weeklyLogs) => set({ weeklyLogs }),
 
       resetIfNewDay: () => {
         const { todayLog, hasLoggedToday } = get();
@@ -120,6 +133,7 @@ export const useTrackStore = create<TrackState>()(
       partialize: (state) => ({
         hasLoggedToday: state.hasLoggedToday,
         todayLog: state.todayLog,
+        weeklyLogs: state.weeklyLogs,
       }),
       onRehydrateStorage: () => () => {
         useTrackStore.getState().resetIfNewDay();

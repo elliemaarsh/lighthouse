@@ -5,7 +5,8 @@ import { GlassChip } from '@/components/GlassChip';
 import { inputFieldStyle } from '@/constants/surfaces';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { NOTE_QUICK_INSERTS } from '@/constants/partner';
-import { colors, fontSizes, fonts, radius, textContrast } from '@/constants/theme';
+import { partnerSheet, partnerSheetTypography } from '@/constants/partnerSheet';
+import { fontSizes, radius } from '@/constants/theme';
 import type { PartnerLogData } from '@/types/partnerLog';
 
 type NotesSheetContentProps = {
@@ -34,7 +35,7 @@ export function NotesSheetContent({ log, onSave }: NotesSheetContentProps) {
         value={notes}
         onChangeText={setNotes}
         placeholder="How are you feeling today?"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={partnerSheet.subtextColor}
         multiline
         style={styles.input}
         textAlignVertical="top"
@@ -62,10 +63,11 @@ const styles = StyleSheet.create({
     minHeight: 160,
     padding: 20,
     fontSize: fontSizes.body,
-    fontFamily: fonts.regular,
-    color: colors.textPrimary,
+    fontFamily: partnerSheetTypography.label.fontFamily,
+    color: partnerSheet.labelColor,
     lineHeight: 22,
-    ...textContrast,
+    backgroundColor: partnerSheet.unselectedBg,
+    borderColor: partnerSheet.unselectedBorder,
   },
   quickRow: {
     flexDirection: 'row',

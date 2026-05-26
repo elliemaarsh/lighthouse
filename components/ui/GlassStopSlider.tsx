@@ -9,7 +9,28 @@ import {
 import Svg, { Circle } from 'react-native-svg';
 
 import { GlassSurface } from '@/components/GlassSurface';
-import { colors, fontSizes, fonts, radius, textContrast } from '@/constants/theme';
+import { colors, fontSizes, fonts, radius } from '@/constants/theme';
+
+const SLIDER_PALETTES = {
+  gradient: {
+    label: colors.textOnDark,
+    value: colors.textOnDark,
+    stopLabel: colors.textOnDarkFaint,
+    dot: 'rgba(255, 255, 255, 0.28)',
+    dotActive: 'rgba(255, 255, 255, 0.55)',
+    thumbLine: colors.white,
+    trackVariant: 'pill' as const,
+  },
+  mist: {
+    label: colors.textPrimary,
+    value: colors.textPrimary,
+    stopLabel: colors.textMuted,
+    dot: 'rgba(26, 36, 34, 0.2)',
+    dotActive: 'rgba(39, 53, 158, 0.45)',
+    thumbLine: '#27359E',
+    trackVariant: 'light' as const,
+  },
+} as const;
 
 const THUMB_WIDTH = 52;
 const THUMB_HEIGHT = 44;
@@ -27,6 +48,7 @@ type GlassStopSliderProps<T extends string | number> = {
   leftLabel: string;
   formatDisplay?: (value: T, stop: GlassSliderStop<T>) => string;
   accentColor?: string;
+  palette?: keyof typeof SLIDER_PALETTES;
 };
 
 function clampIndex(index: number, max: number) {
@@ -40,7 +62,9 @@ export function GlassStopSlider<T extends string | number>({
   leftLabel,
   formatDisplay,
   accentColor = colors.accentLime,
+  palette = 'gradient',
 }: GlassStopSliderProps<T>) {
+  const paletteColors = SLIDER_PALETTES[palette];
   const [trackWidth, setTrackWidth] = useState(0);
   const trackWidthRef = useRef(0);
 
@@ -113,13 +137,18 @@ export function GlassStopSlider<T extends string | number>({
   return (
     <View style={styles.wrap}>
       <View style={styles.headerRow}>
-        <Text style={styles.leftLabel}>{leftLabel}</Text>
-        <Text style={styles.rightValue}>{displayValue}</Text>
+        <Text style={[styles.leftLabel, { color: paletteColors.label }]}>{leftLabel}</Text>
+        <Text style={[styles.rightValue, { color: paletteColors.value }]}>{displayValue}</Text>
       </View>
 
       <View style={styles.trackTouch} {...panResponder.panHandlers}>
         <View style={styles.trackOuter} onLayout={onTrackLayout}>
-          <GlassSurface variant="pill" borderRadius={radius.pill} shadow="none" style={styles.trackGlass}>
+          <GlassSurface
+            variant={paletteColors.trackVariant}
+            borderRadius={radius.pill}
+            shadow="none"
+            style={styles.trackGlass}
+          >
             <View style={[styles.trackInner, { height: TRACK_HEIGHT }]}>
               <View style={styles.tickRow} pointerEvents="none">
                 {stops.map((stop, i) => {
@@ -158,9 +187,15 @@ export function GlassStopSlider<T extends string | number>({
               {activeIndex >= 0 ? (
                 <View style={[styles.thumbWrap, { left: thumbLeft }]}>
                   <View style={styles.thumbGlow} />
-                  <GlassSurface variant="selected" borderRadius={radius.pill} shadow="soft">
+                  <GlassSurface
+                    variant={palette === 'mist' ? 'light' : 'selected'}
+                    borderRadius={radius.pill}
+                    shadow="soft"
+                  >
                     <View style={styles.thumb}>
-                      <View style={styles.thumbLine} />
+                      <View
+                        style={[styles.thumbLine, { backgroundColor: paletteColors.thumbLine }]}
+                      />
                     </View>
                   </GlassSurface>
                   <Svg width={THUMB_WIDTH + 8} height={THUMB_HEIGHT + 8} style={styles.thumbRingSvg}>
@@ -183,7 +218,11 @@ export function GlassStopSlider<T extends string | number>({
 
       <View style={styles.stopLabels}>
         {stops.map((stop) => (
-          <Text key={String(stop.value)} style={styles.stopLabel} numberOfLines={1}>
+          <Text
+            key={String(stop.value)}
+            style={[styles.stopLabel, { color: paletteColors.stopLabel }]}
+            numberOfLines={1}
+          >
             {stop.label}
           </Text>
         ))}
@@ -205,15 +244,11 @@ const styles = StyleSheet.create({
   },
   leftLabel: {
     fontSize: fontSizes.body,
-    fontFamily: fonts.medium,
-    color: colors.textOnDark,
-    ...textContrast,
+    fontFamily: fonts.light,
   },
   rightValue: {
     fontSize: fontSizes.h3,
-    fontFamily: fonts.semiBold,
-    color: colors.textOnDark,
-    ...textContrast,
+    fontFamily: fonts.light,
   },
   trackOuter: {
     width: '100%',
@@ -241,10 +276,6 @@ const styles = StyleSheet.create({
     width: 5,
     height: 5,
     borderRadius: 2.5,
-    backgroundColor: 'rgba(255, 255, 255, 0.28)',
-  },
-  dotActive: {
-    backgroundColor: 'rgba(255, 255, 255, 0.55)',
   },
   trackTouch: {
     width: '100%',
@@ -285,7 +316,6 @@ const styles = StyleSheet.create({
     width: 2,
     height: 18,
     borderRadius: 1,
-    backgroundColor: colors.white,
   },
   thumbRingSvg: {
     position: 'absolute',
@@ -301,9 +331,7 @@ const styles = StyleSheet.create({
   stopLabel: {
     flex: 1,
     fontSize: 10,
-    fontFamily: fonts.medium,
-    color: colors.textOnDarkFaint,
+    fontFamily: fonts.light,
     textAlign: 'center',
-    ...textContrast,
   },
 });

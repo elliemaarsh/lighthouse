@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { GlassStopSlider } from '@/components/ui/GlassStopSlider';
 import { PartnerSheetShell } from '@/components/partner/sheets/PartnerSheetShell';
 import { HEAT_OPTIONS } from '@/constants/partner';
-import { colors, fontSizes, fonts, textContrast } from '@/constants/theme';
+import { partnerSheetTypography } from '@/constants/partnerSheet';
 import type { HeatLevel, PartnerLogData } from '@/types/partnerLog';
 
 type HeatSheetContentProps = {
@@ -47,6 +47,7 @@ export function HeatSheetContent({ log, onSave }: HeatSheetContentProps) {
         value={level}
         onChange={setLevel}
         leftLabel="Heat"
+        palette="mist"
         formatDisplay={(_, stop) => stop.label}
       />
 
@@ -59,30 +60,20 @@ export function HeatSheetContent({ log, onSave }: HeatSheetContentProps) {
 
 const styles = StyleSheet.create({
   prompt: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkFaint,
+    ...partnerSheetTypography.subtext,
     textAlign: 'center',
     marginBottom: 20,
-    ...textContrast,
   },
   subtitle: {
-    fontSize: fontSizes.body,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkMuted,
+    ...partnerSheetTypography.label,
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 22,
     paddingHorizontal: 8,
-    ...textContrast,
   },
   hint: {
-    fontSize: fontSizes.label,
-    fontFamily: fonts.regular,
-    color: colors.textOnDarkFaint,
+    ...partnerSheetTypography.subtext,
     marginTop: 20,
-    lineHeight: 18,
     textAlign: 'center',
-    ...textContrast,
   },
 });

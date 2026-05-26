@@ -2,16 +2,13 @@ import { BottomSheetModal, BottomSheetScrollView } from '@gorhom/bottom-sheet';
 import { forwardRef, useCallback, useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { AppBlurView } from '@/components/AppBlurView';
-
 import { ExerciseSheetContent } from '@/components/partner/sheets/ExerciseSheetContent';
 import { HeatSheetContent } from '@/components/partner/sheets/HeatSheetContent';
 import { NotesSheetContent } from '@/components/partner/sheets/NotesSheetContent';
 import { SleepSheetContent } from '@/components/partner/sheets/SleepSheetContent';
 import { StressSheetContent } from '@/components/partner/sheets/StressSheetContent';
 import { SubstancesSheetContent } from '@/components/partner/sheets/SubstancesSheetContent';
-import { glass } from '@/constants/glass';
-import { colors } from '@/constants/theme';
+import { partnerSheet } from '@/constants/partnerSheet';
 import type { PartnerCategoryId, PartnerLogData } from '@/types/partnerLog';
 
 type PartnerLogSheetProps = {
@@ -22,14 +19,7 @@ type PartnerLogSheetProps = {
 };
 
 function SheetBackground() {
-  return (
-    <AppBlurView
-      style={StyleSheet.absoluteFill}
-      blurType="light"
-      blurAmount={24}
-      reducedTransparencyFallbackColor="rgba(48, 82, 130, 0.85)"
-    />
-  );
+  return <View style={styles.sheetBgFill} />;
 }
 
 export const PartnerLogSheet = forwardRef<BottomSheetModal, PartnerLogSheetProps>(
@@ -75,7 +65,10 @@ export const PartnerLogSheet = forwardRef<BottomSheetModal, PartnerLogSheetProps
         backgroundStyle={styles.sheetBg}
         handleIndicatorStyle={styles.handle}
       >
-        <BottomSheetScrollView contentContainerStyle={styles.scroll}>
+        <BottomSheetScrollView
+          contentContainerStyle={styles.scroll}
+          style={styles.scrollView}
+        >
           {content}
         </BottomSheetScrollView>
       </BottomSheetModal>
@@ -84,15 +77,23 @@ export const PartnerLogSheet = forwardRef<BottomSheetModal, PartnerLogSheetProps
 );
 
 const styles = StyleSheet.create({
+  sheetBgFill: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: partnerSheet.background,
+  },
   sheetBg: {
-    backgroundColor: colors.backgroundTransparent,
+    backgroundColor: partnerSheet.background,
   },
   handle: {
-    backgroundColor: glass.lineStrong,
+    backgroundColor: partnerSheet.handle,
     width: 36,
+  },
+  scrollView: {
+    backgroundColor: partnerSheet.background,
   },
   scroll: {
     flexGrow: 1,
     paddingBottom: 24,
+    backgroundColor: partnerSheet.background,
   },
 });

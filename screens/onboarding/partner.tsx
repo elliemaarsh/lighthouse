@@ -1,4 +1,3 @@
-import { router } from 'expo-router';
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
@@ -6,23 +5,21 @@ import { OnboardingScreen } from '@/components/onboarding/OnboardingScreen';
 import { OnboardingTypography } from '@/components/onboarding/OnboardingTypography';
 import { PillButton } from '@/components/onboarding/PillButton';
 import { PillTextInput } from '@/components/onboarding/PillTextInput';
-import { routes } from '@/constants/routes';
 import { spacing } from '@/constants/theme';
+import { finishOnboarding } from '@/lib/finishOnboarding';
 import { useUserStore } from '@/store/useUserStore';
 
 export default function PartnerInviteScreen() {
   const partnerEmail = useUserStore((s) => s.partnerEmail);
   const setPartnerEmail = useUserStore((s) => s.setPartnerEmail);
-  const completeOnboarding = useUserStore((s) => s.completeOnboarding);
   const [email, setEmail] = useState(partnerEmail);
 
-  const finishOnboarding = (sentInvite: boolean) => {
+  const handleFinish = (sentInvite: boolean) => {
     if (sentInvite && email.trim()) {
       setPartnerEmail(email.trim());
       // TODO: Send partner invite via Supabase when backend is wired
     }
-    completeOnboarding();
-    router.replace(routes.home);
+    finishOnboarding();
   };
 
   return (
@@ -46,12 +43,12 @@ export default function PartnerInviteScreen() {
         <View style={styles.actions}>
           <PillButton
             label="Send Invite"
-            onPress={() => finishOnboarding(true)}
+            onPress={() => handleFinish(true)}
           />
           <PillButton
             label="Skip for now"
             variant="ghost"
-            onPress={() => finishOnboarding(false)}
+            onPress={() => handleFinish(false)}
           />
         </View>
       </View>

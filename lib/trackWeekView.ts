@@ -13,6 +13,7 @@ export type WeekDayCell = {
   hasLog: boolean;
   mood: number | null;
   temperature: number | null;
+  symptoms: string[];
 };
 
 export function getWeekEndString(weekStart: string): string {
@@ -70,41 +71,59 @@ export function buildWeekDayCells(
         entry?.temperatureNotMeasured || entry?.temperature == null
           ? null
           : entry.temperature,
+      symptoms: entry?.symptoms ?? [],
     };
   });
 }
 
-const PLACEHOLDER_TEMPS = [97.2, 97.4, 97.1, 97.5, 97.3, 97.6, 97.8];
+const BBT_MIN = 97.0;
+const BBT_MAX = 98.5;
 
 export function buildBbtSparklinePath(
   days: WeekDayCell[],
   width: number,
+  height = 20,
 ): string {
-  const values = days.map((d, i) =>
-    d.temperature != null ? d.temperature : PLACEHOLDER_TEMPS[i],
-  );
-  const min = Math.min(...values) - 0.2;
-  const max = Math.max(...values) + 0.2;
-  const range = max - min || 1;
-  const h = 20;
   const pad = 2;
+  const innerH = height - pad * 2;
 
-  const points = values.map((v, i) => {
-    const x = pad + (i / Math.max(values.length - 1, 1)) * (width - pad * 2);
-    const y = h - pad - ((v - min) / range) * (h - pad * 2);
-    return { x, y };
+  const points: { x: number; y: number }[] = [];
+  days.forEach((d, i) => {
+    if (d.temperature == null) return;
+    const x = pad + (i / Math.max(days.length - 1, 1)) * (width - pad * 2);
+    const y =
+      pad + innerH - ((d.temperature - BBT_MIN) / (BBT_MAX - BBT_MIN)) * innerH;
+    points.push({ x, y });
   });
 
-  if (points.length === 0) return '';
+  if (points.length < 2) return '';
 
   let d = `M ${points[0].x},${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
-    const prev = points[i - 1];
-    const curr = points[i];
+    const prev = points[i - 1]!;
+    const curr = points[i]!;
     const cx = (prev.x + curr.x) / 2;
     d += ` C ${cx},${prev.y} ${cx},${curr.y} ${curr.x},${curr.y}`;
   }
   return d;
+}
+
+/** Temperature trend for the carrying partner trends card (taller viewBox). */
+export function buildBbtTrendSparklinePath(
+  days: WeekDayCell[],
+  width: number,
+): string {
+  return buildBbtSparklinePath(days, width, 32);
+}
+
+export function bbtSparklineCaption(days: WeekDayCell[]): string | null {
+  const temps = days
+    .map((d) => d.temperature)
+    .filter((t): t is number => t != null);
+  if (temps.length < 2) return null;
+  const first = temps[0]!;
+  const last = temps[temps.length - 1]!;
+  return `${first.toFixed(1)} → ${last.toFixed(1)}°F this week`;
 }
 
 export const MOOD_MINI_HEIGHTS = [4, 6, 8, 10, 12] as const;

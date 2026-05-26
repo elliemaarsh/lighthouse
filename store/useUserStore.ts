@@ -97,6 +97,7 @@ type UserState = {
   setCommunityUsername: (communityUsername: string | null) => void;
   setHasSetUpCommunity: (hasSetUpCommunity: boolean) => void;
   completeCommunitySetup: (username: string) => void;
+  setHasCompletedOnboarding: (hasCompletedOnboarding: boolean) => void;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
 };
@@ -208,6 +209,8 @@ export const useUserStore = create<UserState>()(
           communityUsername: username,
           hasSetUpCommunity: true,
         }),
+      setHasCompletedOnboarding: (hasCompletedOnboarding) =>
+        set({ hasCompletedOnboarding }),
       completeOnboarding: () => {
         const state = get();
         const journeyType =
@@ -229,6 +232,7 @@ export const useUserStore = create<UserState>()(
     {
       name: USER_STORAGE_KEY,
       storage: createJSONStorage(getUserStorage),
+      // Full state is persisted (including `role`) — no partialize whitelist.
       skipHydration: !isClient,
       onRehydrateStorage: () => (state, error) => {
         if (error) {
